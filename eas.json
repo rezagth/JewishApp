@@ -1,0 +1,44 @@
+{
+  "cli": {
+    "version": ">= 5.0.0",
+    "promptToConfigurePushNotifications": true
+  },
+  "build": {
+    "preview": {
+      "ios": {
+        "image": "latest",
+        "distribution": "internal",
+        "simulator": false,
+        "buildType": "simulator"
+      },
+      "android": {
+        "image": "latest",
+        "buildType": "apk"
+      }
+    },
+    "production": {
+      "ios": {
+        "image": "latest",
+        "distribution": "app-store",
+        "enterprise": false,
+        "simulator": false
+      },
+      "android": {
+        "image": "latest",
+        "buildType": "aab"
+      }
+    }
+  },
+  "submit": {
+    "production": {
+      "ios": {
+        "appleId": "your-email@apple.com",
+        "ascAppId": "1234567890",
+        "appleTeamId": "XXXXXXXXXX"
+      },
+      "android": {
+        "serviceAccountJson": "path/to/service-account.json"
+      }
+    }
+  }
+}
