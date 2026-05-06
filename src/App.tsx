@@ -8,14 +8,13 @@ import { Provider } from 'react-redux';
 import {
   NavigationContainer,
   DefaultTheme,
-  DarkTheme,
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
-import { Text, useColorScheme } from 'react-native';
+import { Text, View, StyleSheet } from 'react-native';
 
 import store from '@store/index';
 import HomeScreen from '@screens/HomeScreen';
@@ -23,7 +22,6 @@ import SiddurScreen from '@screens/SiddurScreen';
 import CalendarScreen from '@screens/CalendarScreen';
 import SettingsScreen from '@screens/SettingsScreen';
 import NotificationService from '@services/notifications';
-import { COLORS } from '@constants/index';
 
 // Configuration navigation
 const Stack = createNativeStackNavigator();
@@ -32,91 +30,147 @@ const Tab = createBottomTabNavigator();
 // Garder la splash screen visible jusqu'au chargement
 SplashScreen.preventAutoHideAsync();
 
+// ─── Icône d'onglet personnalisée ─────────────────────────────────────────────
+interface TabIconProps {
+  label: string;
+  icon: string;
+  focused: boolean;
+}
+
+const TabIcon: React.FC<TabIconProps> = ({ label, icon, focused }) => (
+  <View style={[tabStyles.iconWrap, focused && tabStyles.iconWrapFocused]}>
+    <Text style={[tabStyles.iconEmoji, focused && tabStyles.iconFocused]}>{icon}</Text>
+    <Text style={[tabStyles.iconLabel, focused && tabStyles.iconLabelFocused]}>{label}</Text>
+  </View>
+);
+
+const tabStyles = StyleSheet.create({
+  iconWrap: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    minWidth: 54,
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    borderRadius: 18,
+  },
+  iconWrapFocused: {
+    backgroundColor: 'rgba(233, 195, 73, 0.14)',
+    borderWidth: 1,
+    borderColor: 'rgba(233, 195, 73, 0.24)',
+  },
+  iconEmoji: {
+    fontSize: 20,
+    color: '#96A0B6',
+  },
+  iconFocused: {
+    color: '#F1D77A',
+  },
+  iconLabel: {
+    marginTop: 3,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+    color: '#96A0B6',
+  },
+  iconLabelFocused: {
+    color: '#F1D77A',
+  },
+});
+
+// ─── Thème navigation de l'app ────────────────────────────────────────────────
+const WhiteTheme = {
+  ...DefaultTheme,
+  colors: {
+    ...DefaultTheme.colors,
+    primary: '#F1D77A',
+    background: '#0C1322',
+    card: '#0C1322',
+    text: '#DCE2F7',
+    border: 'rgba(255,255,255,0.08)',
+    notification: '#F1D77A',
+  },
+};
+
 /**
- * Composant de navigation au niveau du Tab Bar
+ * Barre de navigation du bas - style cohérent avec l'app
  */
 const HomeTabs = () => {
-  const colorScheme = useColorScheme();
-
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
+        tabBarHideOnKeyboard: true,
+        tabBarShowLabel: false,
         tabBarStyle: {
           position: 'absolute',
-          left: 16,
-          right: 16,
-          bottom: 18,
-          height: 74,
-          borderTopWidth: 0,
-          borderRadius: 28,
-          backgroundColor: 'rgba(20, 27, 43, 0.96)',
-          borderColor: 'rgba(255, 255, 255, 0.08)',
-          shadowColor: '#000000',
-          shadowOpacity: 0.28,
-          shadowRadius: 30,
-          shadowOffset: { width: 0, height: 18 },
-          elevation: 18,
-          paddingTop: 10,
+          left: 14,
+          right: 14,
+          bottom: 14,
+          height: 76,
           paddingBottom: 10,
-          paddingHorizontal: 14,
-        },
-        tabBarActiveTintColor: COLORS.secondary,
-        tabBarInactiveTintColor: '#6E7A92',
-        tabBarLabelStyle: {
-          fontSize: 10,
-          fontWeight: '600',
-          letterSpacing: 0.3,
+          paddingTop: 8,
+          backgroundColor: 'rgba(12, 19, 34, 0.96)',
+          borderTopWidth: 0,
+          borderWidth: 1,
+          borderColor: 'rgba(255,255,255,0.08)',
+          borderRadius: 26,
+          elevation: 18,
+          shadowColor: '#000',
+          shadowOpacity: 0.28,
+          shadowRadius: 18,
+          shadowOffset: { width: 0, height: 10 },
+          overflow: 'hidden',
         },
         tabBarItemStyle: {
-          paddingTop: 2,
-          paddingBottom: 2,
+          paddingTop: 4,
+          paddingBottom: 0,
         },
+        tabBarActiveTintColor: '#F1D77A',
+        tabBarInactiveTintColor: '#96A0B6',
       }}
     >
       <Tab.Screen
-        name="Home"
+        name="Accueil"
         component={HomeScreen}
         options={{
           tabBarLabel: 'Accueil',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20, color }}>◫</Text>
+          tabBarIcon: ({ focused }) => (
+            <TabIcon label="Accueil" icon="⌂" focused={focused} />
           ),
         }}
       />
 
-      {/* Onglet Siddur */}
       <Tab.Screen
         name="Siddur"
         component={SiddurScreen}
         options={{
           tabBarLabel: 'Siddur',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20, color }}>☰</Text>
+          tabBarIcon: ({ focused }) => (
+            <TabIcon label="Siddur" icon="✡" focused={focused} />
           ),
         }}
       />
 
-      {/* Onglet Calendrier */}
+      {/* ── Calendrier ── */}
       <Tab.Screen
-        name="Calendar"
         component={CalendarScreen}
+        name="Calendrier"
         options={{
           tabBarLabel: 'Calendrier',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20, color }}>▣</Text>
+          tabBarIcon: ({ focused }) => (
+            <TabIcon label="Calendrier" icon="🗓" focused={focused} />
           ),
         }}
       />
 
-      {/* Onglet Paramètres */}
+      {/* ── Réglages ── */}
       <Tab.Screen
-        name="Settings"
         component={SettingsScreen}
+        name="Réglages"
         options={{
-          tabBarLabel: 'Paramètres',
-          tabBarIcon: ({ color }) => (
-            <Text style={{ fontSize: 20, color }}>⚙</Text>
+          tabBarLabel: 'Réglages',
+          tabBarIcon: ({ focused }) => (
+            <TabIcon label="Réglages" icon="⚙" focused={focused} />
           ),
         }}
       />
@@ -128,21 +182,13 @@ const HomeTabs = () => {
  * Composant App principal
  */
 const App = () => {
-  const colorScheme = useColorScheme();
   const [appIsReady, setAppIsReady] = useState(false);
 
   useEffect(() => {
     async function prepare() {
       try {
-        // Charger les ressources
-        await Font.loadAsync({
-          // Ajouter les polices personnalisées si nécessaire
-        });
-
-        // Initialiser les services
+        await Font.loadAsync({});
         await NotificationService.initialize();
-
-        // Imprimer que l'app est prête
         setAppIsReady(true);
       } catch (e) {
         console.warn('Erreur préparation app:', e);
@@ -158,43 +204,13 @@ const App = () => {
     return null;
   }
 
-  const MyLightTheme = {
-    ...DefaultTheme,
-    colors: {
-      ...DefaultTheme.colors,
-      primary: COLORS.primary,
-      background: COLORS.background,
-      card: '#FFFFFF',
-      text: '#212121',
-      border: COLORS.border,
-    },
-  };
-
-  const MyDarkTheme = {
-    ...DarkTheme,
-    colors: {
-      ...DarkTheme.colors,
-      primary: COLORS.primary,
-      background: COLORS.darkBackground,
-      card: '#212121',
-      text: '#FFFFFF',
-      border: '#424242',
-    },
-  };
-
   return (
     <Provider store={store}>
-      <NavigationContainer
-        theme={MyDarkTheme}
-      >
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-          }}
-        >
+      <NavigationContainer theme={WhiteTheme}>
+        <Stack.Navigator screenOptions={{ headerShown: false }}>
           <Stack.Screen name="MainTabs" component={HomeTabs} />
         </Stack.Navigator>
-        <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
+        <StatusBar style="dark" />
       </NavigationContainer>
     </Provider>
   );
