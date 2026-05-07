@@ -43,86 +43,74 @@ export const useZmanim = () => {
   };
 
   /**
-   * Charge la localisation et les Zmanim
+   * Rafraîchit les données pour une localisation spécifique
+   */
+  const refreshZmanim = async (location: Location) => {
+    dispatch(setLoading(true));
+    try {
+      const timezone = await GeolocationService.getTimezone(location);
+      const zmanimData = await ZmanService.getZmanim(dayjs(), {
+        ...location,
+        timezone: timezone ?? undefined,
+      });
+      dispatch(setZmanim(zmanimData));
+
+      const rangeStart = dayjs().startOf('month').startOf('week');
+      const rangeEnd = rangeStart.clone().add(42, 'day');
+      const summary = await ZmanService.getCalendarSummary(
+        rangeStart,
+        { ...location, timezone: timezone ?? undefined },
+        rangeEnd
+      );
+      dispatch(setHolidays(summary.holidays));
+      setCalendarSummary(summary);
+    } catch (error) {
+      console.error('Erreur rafraîchissement Zmanim:', error);
+    } finally {
+      dispatch(setLoading(false));
+    }
+  };
+
+  /**
+   * Charge la localisation initiale si nécessaire
    */
   useEffect(() => {
-    const loadZmanim = async () => {
-      dispatch(setLoading(true));
-      try {
-        // Obtenir la localisation
-        console.log('📍 Demande de localisation...');
-        const location = await GeolocationService.getCurrentLocation();
-        if (location) {
-          console.log('✅ Localisation obtenue:', location);
-          const timezone = await GeolocationService.getTimezone(location);
-          dispatch(
-            setUserLocation({
-              latitude: location.latitude,
-              longitude: location.longitude,
-              timezone: timezone ?? undefined,
-            })
-          );
-
-          // Obtenir les Zmanim pour aujourd'hui
-          const zmanimData = await ZmanService.getZmanim(dayjs(), location);
-          dispatch(setZmanim(zmanimData));
-
-          const summary = await ZmanService.getCalendarSummary(
-            dayjs(),
-            {
-              ...location,
-              timezone: timezone ?? undefined,
-            }
-          );
-
-          dispatch(setHolidays(summary.holidays));
-          setCalendarSummary(summary);
-
-          // Obtenir le nom de la ville
-          const cityName = await GeolocationService.getCityName(location);
-          dispatch(
-            setUserLocation({
+    if (!userLocation) {
+      const initLocation = async () => {
+        dispatch(setLoading(true));
+        try {
+          const location = await GeolocationService.getCurrentLocation();
+          if (location) {
+            const cityName = await GeolocationService.getCityName(location);
+            const timezone = await GeolocationService.getTimezone(location);
+            const newLoc = {
               latitude: location.latitude,
               longitude: location.longitude,
               city: cityName ?? undefined,
               timezone: timezone ?? undefined,
-            })
-          );
-        } else {
-          // 🔴 Fallback à Jérusalem si geolocation échoue
-          console.warn('⚠️ Localisation non disponible, utilisation de Jérusalem');
+            };
+            dispatch(setUserLocation(newLoc));
+          } else {
+            dispatch(setUserLocation(DEFAULT_LOCATION as any));
+          }
+        } catch (err) {
           dispatch(setUserLocation(DEFAULT_LOCATION as any));
-          
-          const zmanimData = await ZmanService.getZmanim(dayjs(), DEFAULT_LOCATION as Location);
-          console.log('📊 Zmanim obtenues:', zmanimData);
-          dispatch(setZmanim(zmanimData));
-          
-          const summary = await ZmanService.getCalendarSummary(
-            dayjs(),
-            DEFAULT_LOCATION as Location
-          );
-          dispatch(setHolidays(summary.holidays));
-          setCalendarSummary(summary);
+        } finally {
+          dispatch(setLoading(false));
         }
-      } catch (error) {
-        console.error('🔴 Erreur chargement Zmanim:', error);
-        // Fallback final: Jérusalem avec heures approximatives
-        console.warn('⚠️ Fallback à Jérusalem (heures approximatives)');
-        dispatch(setUserLocation(DEFAULT_LOCATION as any));
-        const zmanimData = await ZmanService.getZmanim(dayjs(), DEFAULT_LOCATION as Location);
-        dispatch(setZmanim(zmanimData));
-        setCalendarSummary(null);
-      } finally {
-        dispatch(setLoading(false));
-      }
-    };
+      };
+      initLocation();
+    }
+  }, [dispatch, userLocation]);
 
-    loadZmanim();
-
-    // Rafraîchir tous les jours
-    const interval = setInterval(loadZmanim, 86400000);
-    return () => clearInterval(interval);
-  }, [dispatch]);
+  /**
+   * Réagit aux changements de localisation
+   */
+  useEffect(() => {
+    if (userLocation) {
+      refreshZmanim(userLocation);
+    }
+  }, [userLocation?.latitude, userLocation?.longitude]);
 
   return {
     zmanim,
@@ -130,6 +118,7 @@ export const useZmanim = () => {
     isLoading,
     calendarSummary,
     nextZman: zmanim ? ZmanService.getNextZman(zmanim) : null,
+    refreshZmanim,
   };
 };
 

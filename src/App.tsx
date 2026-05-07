@@ -8,6 +8,7 @@ import { Provider } from 'react-redux';
 import {
   NavigationContainer,
   DefaultTheme,
+  DarkTheme as NavigationDarkTheme,
 } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
@@ -15,6 +16,8 @@ import { StatusBar } from 'expo-status-bar';
 import * as SplashScreen from 'expo-splash-screen';
 import * as Font from 'expo-font';
 import { Text, View, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { BlurView } from 'expo-blur';
 
 import store from '@store/index';
 import HomeScreen from '@screens/HomeScreen';
@@ -22,6 +25,8 @@ import SiddurScreen from '@screens/SiddurScreen';
 import CalendarScreen from '@screens/CalendarScreen';
 import SettingsScreen from '@screens/SettingsScreen';
 import NotificationService from '@services/notifications';
+import { THEME } from '@constants/theme';
+import { useAppSelector } from '@hooks/useRedux';
 
 // Configuration navigation
 const Stack = createNativeStackNavigator();
@@ -35,66 +40,52 @@ interface TabIconProps {
   label: string;
   icon: string;
   focused: boolean;
+  isDarkMode: boolean;
 }
 
-const TabIcon: React.FC<TabIconProps> = ({ label, icon, focused }) => (
-  <View style={[tabStyles.iconWrap, focused && tabStyles.iconWrapFocused]}>
-    <Text style={[tabStyles.iconEmoji, focused && tabStyles.iconFocused]}>{icon}</Text>
-    <Text style={[tabStyles.iconLabel, focused && tabStyles.iconLabelFocused]}>{label}</Text>
-  </View>
-);
+const TabIcon: React.FC<TabIconProps> = ({ label, icon, focused, isDarkMode }) => {
+  const theme = isDarkMode ? THEME.dark : THEME.light;
+  const iconColor = isDarkMode ? '#FFFFFF' : '#000000';
+  
+  return (
+    <View style={tabStyles.iconWrap}>
+      <Ionicons 
+        name={icon as any} 
+        size={24} 
+        color={focused ? iconColor : (isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)')} 
+      />
+      <Text style={[
+        tabStyles.iconLabel, 
+        { color: focused ? iconColor : (isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)') }
+      ]}>{label}</Text>
+    </View>
+  );
+};
 
 const tabStyles = StyleSheet.create({
   iconWrap: {
     alignItems: 'center',
     justifyContent: 'center',
-    minWidth: 54,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 18,
-  },
-  iconWrapFocused: {
-    backgroundColor: 'rgba(233, 195, 73, 0.14)',
-    borderWidth: 1,
-    borderColor: 'rgba(233, 195, 73, 0.24)',
+    minWidth: 50,
   },
   iconEmoji: {
     fontSize: 20,
-    color: '#96A0B6',
-  },
-  iconFocused: {
-    color: '#F1D77A',
   },
   iconLabel: {
-    marginTop: 3,
+    marginTop: 2,
     fontSize: 10,
     fontWeight: '800',
     letterSpacing: 0.8,
-    color: '#96A0B6',
-  },
-  iconLabelFocused: {
-    color: '#F1D77A',
   },
 });
-
-// ─── Thème navigation de l'app ────────────────────────────────────────────────
-const WhiteTheme = {
-  ...DefaultTheme,
-  colors: {
-    ...DefaultTheme.colors,
-    primary: '#F1D77A',
-    background: '#0C1322',
-    card: '#0C1322',
-    text: '#DCE2F7',
-    border: 'rgba(255,255,255,0.08)',
-    notification: '#F1D77A',
-  },
-};
 
 /**
  * Barre de navigation du bas - style cohérent avec l'app
  */
 const HomeTabs = () => {
+  const isDarkMode = useAppSelector((state) => state.user.preferences.isDarkMode);
+  const theme = isDarkMode ? THEME.dark : THEME.light;
+
   return (
     <Tab.Navigator
       screenOptions={{
@@ -103,30 +94,38 @@ const HomeTabs = () => {
         tabBarShowLabel: false,
         tabBarStyle: {
           position: 'absolute',
-          left: 14,
-          right: 14,
-          bottom: 14,
-          height: 76,
-          paddingBottom: 10,
-          paddingTop: 8,
-          backgroundColor: 'rgba(12, 19, 34, 0.96)',
+          left: 20,
+          right: 20,
+          bottom: 24,
+          height: 64,
+          backgroundColor: 'transparent',
           borderTopWidth: 0,
           borderWidth: 1,
-          borderColor: 'rgba(255,255,255,0.08)',
-          borderRadius: 26,
-          elevation: 18,
+          borderColor: isDarkMode ? 'rgba(255, 255, 255, 0.15)' : 'rgba(0, 0, 0, 0.08)',
+          borderRadius: 32,
+          elevation: 0,
           shadowColor: '#000',
-          shadowOpacity: 0.28,
-          shadowRadius: 18,
+          shadowOpacity: isDarkMode ? 0.4 : 0.1,
+          shadowRadius: 20,
           shadowOffset: { width: 0, height: 10 },
           overflow: 'hidden',
+          paddingBottom: 0, // Désactive le padding par défaut pour centrer manuellement
         },
+        tabBarBackground: () => (
+          <BlurView
+            tint={isDarkMode ? 'dark' : 'light'}
+            intensity={isDarkMode ? 80 : 90}
+            style={StyleSheet.absoluteFill}
+          />
+        ),
         tabBarItemStyle: {
-          paddingTop: 4,
+          height: 64,
+          paddingTop: 0,
           paddingBottom: 0,
+          justifyContent: 'center',
         },
-        tabBarActiveTintColor: '#F1D77A',
-        tabBarInactiveTintColor: '#96A0B6',
+        tabBarActiveTintColor: theme.colors.primary,
+        tabBarInactiveTintColor: theme.colors.textSecondary,
       }}
     >
       <Tab.Screen
@@ -135,7 +134,7 @@ const HomeTabs = () => {
         options={{
           tabBarLabel: 'Accueil',
           tabBarIcon: ({ focused }) => (
-            <TabIcon label="Accueil" icon="⌂" focused={focused} />
+            <TabIcon label="Accueil" icon={focused ? "home" : "home-outline"} focused={focused} isDarkMode={isDarkMode} />
           ),
         }}
       />
@@ -146,35 +145,63 @@ const HomeTabs = () => {
         options={{
           tabBarLabel: 'Siddur',
           tabBarIcon: ({ focused }) => (
-            <TabIcon label="Siddur" icon="✡" focused={focused} />
+            <TabIcon label="Siddur" icon={focused ? "book" : "book-outline"} focused={focused} isDarkMode={isDarkMode} />
           ),
         }}
       />
 
-      {/* ── Calendrier ── */}
       <Tab.Screen
         component={CalendarScreen}
         name="Calendrier"
         options={{
           tabBarLabel: 'Calendrier',
           tabBarIcon: ({ focused }) => (
-            <TabIcon label="Calendrier" icon="🗓" focused={focused} />
+            <TabIcon label="Calendrier" icon={focused ? "calendar" : "calendar-outline"} focused={focused} isDarkMode={isDarkMode} />
           ),
         }}
       />
 
-      {/* ── Réglages ── */}
       <Tab.Screen
         component={SettingsScreen}
         name="Réglages"
         options={{
           tabBarLabel: 'Réglages',
           tabBarIcon: ({ focused }) => (
-            <TabIcon label="Réglages" icon="⚙" focused={focused} />
+            <TabIcon label="Réglages" icon={focused ? "settings" : "settings-outline"} focused={focused} isDarkMode={isDarkMode} />
           ),
         }}
       />
     </Tab.Navigator>
+  );
+};
+
+/**
+ * Composant de navigation principal
+ */
+const AppNavigator = () => {
+  const isDarkMode = useAppSelector((state) => state.user.preferences.isDarkMode);
+  const theme = isDarkMode ? THEME.dark : THEME.light;
+
+  const NavigationTheme = {
+    ...(isDarkMode ? NavigationDarkTheme : DefaultTheme),
+    colors: {
+      ...(isDarkMode ? NavigationDarkTheme.colors : DefaultTheme.colors),
+      primary: theme.colors.primary,
+      background: theme.colors.background,
+      card: theme.colors.surface,
+      text: theme.colors.text,
+      border: theme.colors.border,
+      notification: theme.colors.accent,
+    },
+  };
+
+  return (
+    <NavigationContainer theme={NavigationTheme}>
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="MainTabs" component={HomeTabs} />
+      </Stack.Navigator>
+      <StatusBar style={isDarkMode ? 'light' : 'dark'} />
+    </NavigationContainer>
   );
 };
 
@@ -187,7 +214,7 @@ const App = () => {
   useEffect(() => {
     async function prepare() {
       try {
-        await Font.loadAsync({});
+        // await Font.loadAsync({}); // Add fonts here if needed
         await NotificationService.initialize();
         setAppIsReady(true);
       } catch (e) {
@@ -206,12 +233,7 @@ const App = () => {
 
   return (
     <Provider store={store}>
-      <NavigationContainer theme={WhiteTheme}>
-        <Stack.Navigator screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="MainTabs" component={HomeTabs} />
-        </Stack.Navigator>
-        <StatusBar style="dark" />
-      </NavigationContainer>
+      <AppNavigator />
     </Provider>
   );
 };

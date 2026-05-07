@@ -155,6 +155,51 @@ export class GeolocationService {
       return null;
     }
   }
+  /**
+   * Recherche des villes via Nominatim (OpenStreetMap)
+   */
+  static async searchCities(query: string): Promise<Array<{
+    latitude: number;
+    longitude: number;
+    city: string;
+    display_name: string;
+  }>> {
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=5&accept-language=fr`;
+      
+      const response = await fetch(url, {
+        headers: {
+          'User-Agent': 'JewishApp-Siddur-Project',
+          'Accept': 'application/json'
+        }
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const text = await response.text();
+        console.error('🔴 Réponse non-JSON reçue:', text.substring(0, 100));
+        return [];
+      }
+      
+      const data = await response.json();
+      
+      if (!Array.isArray(data)) return [];
+
+      return data.map((item: any) => ({
+        latitude: parseFloat(item.lat),
+        longitude: parseFloat(item.lon),
+        city: item.address.city || item.address.town || item.address.village || item.display_name.split(',')[0],
+        display_name: item.display_name
+      }));
+    } catch (error) {
+      console.error('Erreur recherche ville:', error);
+      return [];
+    }
+  }
 }
 
 export default GeolocationService;

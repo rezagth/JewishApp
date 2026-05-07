@@ -1,6 +1,5 @@
 /**
  * PrayerReaderScreen - Écran de lecture d'une prière
- * Affiche le texte hébreu récupéré depuis Sefaria API
  */
 
 import React, { useEffect, useState, useCallback } from 'react';
@@ -11,11 +10,14 @@ import {
   ScrollView,
   TouchableOpacity,
   ActivityIndicator,
-  Alert,
   StatusBar,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { PrayerCategory, getCachedSefariaText, SefariaText } from '@services/sefaria.service';
+import { PrayerCategory } from '@services/prayerCategories.service';
+import { useTheme } from '@hooks/useTheme';
+import { AppTheme } from '@constants/theme';
+import SiddurService from '@services/siddur.service';
+import { Prayer } from '../types';
 
 interface Props {
   category: PrayerCategory;
@@ -24,34 +26,34 @@ interface Props {
 
 const PrayerReaderScreen: React.FC<Props> = ({ category, onBack }) => {
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
   const [loading, setLoading] = useState(false);
-  const [sefariaData, setSefariaData] = useState<SefariaText | null>(null);
-  const [fontSize, setFontSize] = useState(26);
+  const [prayers, setPrayers] = useState<Prayer[]>([]);
+  const [fontSize, setFontSize] = useState(24);
+
+  const styles = createStyles(theme);
 
   const loadText = useCallback(async () => {
-    if (!category.sefariaRef) return;
     setLoading(true);
     try {
-      const data = await getCachedSefariaText(category.sefariaRef);
-      setSefariaData(data);
+      // On utilise la clé JSON définie dans la catégorie ou l'ID par défaut
+      const serviceKey = category.jsonKey || category.id;
+      const data = await SiddurService.getCompleteSiddur(serviceKey as any, 'sephardic');
+      setPrayers(data);
     } catch (err) {
-      console.warn('Sefaria fetch error:', err);
-      Alert.alert('Erreur', 'Impossible de charger le texte. Vérifiez votre connexion.');
+      console.warn('Siddur fetch error:', err);
     } finally {
       setLoading(false);
     }
-  }, [category.sefariaRef]);
+  }, [category]);
 
   useEffect(() => {
     loadText();
   }, [loadText]);
 
-  // Texte à afficher : Sefaria ou statique
-  const hebrewText = sefariaData?.heText || category.staticHe || '';
-
   return (
     <View style={styles.screen}>
-      <StatusBar barStyle="light-content" backgroundColor="#0C1322" />
+      <StatusBar barStyle={theme.colors.background === '#0C1322' ? 'light-content' : 'dark-content'} />
       <View style={styles.backdropTop} />
       <View style={styles.backdropBottom} />
 
@@ -87,55 +89,43 @@ const PrayerReaderScreen: React.FC<Props> = ({ category, onBack }) => {
       {/* Contenu */}
       {loading ? (
         <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color="#E9C349" />
-          <Text style={styles.loadingText}>Chargement depuis Sefaria...</Text>
+          <ActivityIndicator size="large" color={theme.colors.primary} />
+          <Text style={styles.loadingText}>Chargement des prières...</Text>
         </View>
       ) : (
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={[
             styles.scrollContent,
-            { paddingBottom: insets.bottom + 80 },
+            { paddingBottom: insets.bottom + 40 },
           ]}
           showsVerticalScrollIndicator={false}
         >
-          {/* Badge source */}
-          {sefariaData && (
-            <View style={styles.sourceBadge}>
-              <Text style={styles.sourceBadgeText}>📖 Sefaria.org</Text>
-            </View>
-          )}
-
-          {/* Texte hébreu */}
-          {hebrewText ? (
-            <View style={styles.textCard}>
-              <Text style={[styles.hebrewText, { fontSize }]} selectable>
-                {hebrewText}
-              </Text>
-            </View>
+          {prayers.length > 0 ? (
+            prayers.map((prayer, index) => (
+              <View key={prayer.id} style={[styles.textCard, index > 0 && { marginTop: 20 }]}>
+                <Text style={styles.prayerSectionTitle}>{prayer.titleHe}</Text>
+                <View style={styles.sectionDivider} />
+                <Text style={[styles.contentText, { fontSize }]} selectable>
+                  {prayer.contentHe}
+                </Text>
+              </View>
+            ))
           ) : (
-            <Text style={styles.emptyText}>Texte non disponible</Text>
-          )}
-
-          {/* Titre anglais si disponible */}
-          {sefariaData?.enText ? (
-            <View style={styles.translationCard}>
-              <Text style={styles.translationLabel}>Traduction</Text>
-              <Text style={styles.translationText} selectable>
-                {sefariaData.enText}
-              </Text>
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>Aucun texte trouvé pour cette catégorie.</Text>
             </View>
-          ) : null}
+          )}
         </ScrollView>
       )}
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: AppTheme) => StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#0C1322',
+    backgroundColor: theme.colors.background,
   },
   backdropTop: {
     position: 'absolute',
@@ -144,7 +134,7 @@ const styles = StyleSheet.create({
     width: 260,
     height: 260,
     borderRadius: 130,
-    backgroundColor: 'rgba(233, 195, 73, 0.06)',
+    backgroundColor: theme.colors.highlight,
   },
   backdropBottom: {
     position: 'absolute',
@@ -153,7 +143,8 @@ const styles = StyleSheet.create({
     width: 240,
     height: 240,
     borderRadius: 120,
-    backgroundColor: 'rgba(30, 58, 95, 0.22)',
+    backgroundColor: theme.colors.card,
+    opacity: 0.3,
   },
   header: {
     flexDirection: 'row',
@@ -168,13 +159,13 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: theme.colors.card,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: theme.colors.border,
   },
   backArrow: {
     fontSize: 26,
-    color: '#F1D77A',
+    color: theme.colors.primary,
     transform: [{ rotate: '180deg' }],
     lineHeight: 30,
   },
@@ -186,13 +177,13 @@ const styles = StyleSheet.create({
   headerHe: {
     fontSize: 20,
     fontFamily: 'serif',
-    color: '#DCE2F7',
+    color: theme.colors.text,
     textAlign: 'center',
     writingDirection: 'rtl',
   },
   headerFr: {
     fontSize: 11,
-    color: '#A7B0C4',
+    color: theme.colors.textSecondary,
     textAlign: 'center',
     marginTop: 2,
     letterSpacing: 1.2,
@@ -206,18 +197,18 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 6,
     borderRadius: 10,
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: theme.colors.card,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
+    borderColor: theme.colors.border,
   },
   fontBtnText: {
     fontSize: 13,
-    color: '#F1D77A',
+    color: theme.colors.primary,
     fontFamily: 'serif',
   },
   divider: {
     height: 1,
-    backgroundColor: 'rgba(255,255,255,0.06)',
+    backgroundColor: theme.colors.border,
     marginHorizontal: 20,
   },
   loadingContainer: {
@@ -227,7 +218,7 @@ const styles = StyleSheet.create({
     gap: 16,
   },
   loadingText: {
-    color: '#A7B0C4',
+    color: theme.colors.textSecondary,
     fontSize: 14,
   },
   scroll: {
@@ -237,61 +228,45 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 16,
   },
-  sourceBadge: {
-    alignSelf: 'center',
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    borderRadius: 999,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.10)',
-  },
-  sourceBadgeText: {
-    fontSize: 12,
-    color: '#DCE2F7',
-    letterSpacing: 0.5,
-  },
   textCard: {
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: theme.colors.card,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: theme.colors.border,
     borderRadius: 24,
-    padding: 18,
+    padding: 20,
+    ...theme.shadows.sm,
   },
-  hebrewText: {
+  prayerSectionTitle: {
+    fontSize: 18,
     fontFamily: 'serif',
-    color: '#DCE2F7',
-    textAlign: 'right',
-    writingDirection: 'rtl',
-    lineHeight: 52,
-    letterSpacing: 0.5,
+    color: theme.colors.primary,
+    textAlign: 'center',
+    marginBottom: 10,
+    fontWeight: '700',
+  },
+  sectionDivider: {
+    height: 1,
+    backgroundColor: theme.colors.border,
+    width: '40%',
+    alignSelf: 'center',
+    marginBottom: 15,
+  },
+  contentText: {
+    fontFamily: 'serif',
+    color: theme.colors.text,
+    textAlign: 'center',
+    lineHeight: 44,
+    letterSpacing: 0.2,
+  },
+  emptyContainer: {
+    flex: 1,
+    alignItems: 'center',
+    marginTop: 100,
   },
   emptyText: {
-    textAlign: 'center',
-    color: '#A7B0C4',
+    color: theme.colors.textSecondary,
     fontSize: 16,
-    marginTop: 40,
-  },
-  translationCard: {
-    marginTop: 18,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 24,
-    padding: 18,
-  },
-  translationLabel: {
-    fontSize: 11,
-    color: '#F1D77A',
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    marginBottom: 10,
-  },
-  translationText: {
-    fontSize: 15,
-    color: '#A7B0C4',
-    lineHeight: 26,
+    textAlign: 'center',
   },
 });
 

@@ -31,7 +31,7 @@ export const usePrayer = () => {
     const loadPrayers = async () => {
       dispatch(setLoading(true));
       try {
-        const prayers = await SiddurService.getPrayers(currentService, nusach);
+        const prayers = await SiddurService.getCompleteSiddur(currentService, nusach);
         dispatch(setPrayers(prayers));
         setCurrentServicePrayers(prayers);
       } catch (error) {

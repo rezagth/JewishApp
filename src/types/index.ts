@@ -93,7 +93,11 @@ export interface UserPreferences {
   fontSize: number; // 0.8 to 1.5
   isDarkMode: boolean;
   timezone: string;
-  enableNotifications: boolean;
+  notifications: {
+    shacharit: boolean;
+    mincha: boolean;
+    arvit: boolean;
+  };
 }
 
 // Types pour les notifications

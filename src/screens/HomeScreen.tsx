@@ -10,303 +10,43 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePrayer } from '@hooks/usePrayer';
 import { useZmanim } from '@hooks/useZmanim';
 import { useI18n } from '@hooks/useI18n';
-import { useAppSelector } from '@hooks/useRedux';
-import { COLORS } from '@constants/index';
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: '#0C1322',
-  },
-  backdropTop: {
-    position: 'absolute',
-    top: -80,
-    right: -60,
-    width: 260,
-    height: 260,
-    borderRadius: 130,
-    backgroundColor: 'rgba(233, 195, 73, 0.06)',
-  },
-  backdropBottom: {
-    position: 'absolute',
-    bottom: 80,
-    left: -80,
-    width: 240,
-    height: 240,
-    borderRadius: 120,
-    backgroundColor: 'rgba(30, 58, 95, 0.22)',
-  },
-  scroll: {
-    flex: 1,
-  },
-  content: {
-    paddingHorizontal: 20,
-    paddingBottom: 120,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingTop: 14,
-    paddingBottom: 18,
-  },
-  headerTitle: {
-    color: '#F1D77A',
-    fontSize: 22,
-    letterSpacing: 1.2,
-    fontWeight: '700',
-    fontFamily: 'serif',
-  },
-  avatar: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.22)',
-  },
-  hero: {
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderColor: 'rgba(255,255,255,0.10)',
-    borderWidth: 1,
-    borderRadius: 28,
-    padding: 22,
-    shadowColor: '#000',
-    shadowOpacity: 0.25,
-    shadowRadius: 24,
-    shadowOffset: { width: 0, height: 12 },
-    elevation: 10,
-  },
-  heroLabel: {
-    color: COLORS.secondary,
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 2,
-    textTransform: 'uppercase',
-    marginBottom: 8,
-  },
-  heroRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-  },
-  heroService: {
-    fontSize: 30,
-    color: '#DCE2F7',
-    fontFamily: 'serif',
-    fontWeight: '700',
-  },
-  heroTime: {
-    fontSize: 22,
-    color: '#B9C7E4',
-    textAlign: 'right',
-    fontWeight: '700',
-  },
-  heroMeta: {
-    color: '#8F97A8',
-    textAlign: 'right',
-    marginTop: 4,
-  },
-  progressWrap: {
-    marginTop: 18,
-  },
-  progressLabelRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 8,
-  },
-  progressLabel: {
-    color: '#B9C7E4',
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1,
-  },
-  progressBar: {
-    height: 2,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.10)',
-    overflow: 'hidden',
-  },
-  progressFill: {
-    width: '62%',
-    height: '100%',
-    backgroundColor: 'linear-gradient',
-  },
-  primaryButton: {
-    marginTop: 18,
-    borderRadius: 20,
-    backgroundColor: '#E9C349',
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  primaryButtonText: {
-    color: '#0C1322',
-    fontSize: 15,
-    fontWeight: '800',
-  },
-  section: {
-    marginTop: 22,
-  },
-  sectionTitleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  sectionTitle: {
-    color: '#DCE2F7',
-    fontSize: 16,
-    fontFamily: 'serif',
-    fontWeight: '600',
-  },
-  sectionAction: {
-    color: COLORS.secondary,
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1,
-  },
-  prayerGrid: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  prayerCard: {
-    flex: 1,
-    minHeight: 132,
-    borderRadius: 26,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    padding: 16,
-  },
-  prayerIcon: {
-    fontSize: 22,
-    color: COLORS.secondary,
-    marginBottom: 18,
-  },
-  prayerTitle: {
-    color: '#DCE2F7',
-    fontFamily: 'serif',
-    fontSize: 20,
-    marginBottom: 3,
-  },
-  prayerSubtitle: {
-    color: COLORS.secondary,
-    fontSize: 11,
-    letterSpacing: 1.1,
-    textTransform: 'uppercase',
-  },
-  prayerMiniBar: {
-    marginTop: 16,
-    height: 3,
-    borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.08)',
-  },
-  prayerMiniFill: {
-    width: '38%',
-    height: '100%',
-    borderRadius: 999,
-    backgroundColor: COLORS.secondary,
-  },
-  blessingList: {
-    gap: 10,
-  },
-  blessingCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 14,
-    borderRadius: 18,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-  },
-  blessingIcon: {
-    width: 38,
-    height: 38,
-    borderRadius: 19,
-    backgroundColor: 'rgba(255,255,255,0.06)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginRight: 12,
-    color: '#8F97A8',
-    fontSize: 18,
-  },
-  blessingTitle: {
-    color: '#DCE2F7',
-    fontSize: 15,
-    fontWeight: '600',
-  },
-  blessingSubtitle: {
-    color: '#8F97A8',
-    marginTop: 2,
-  },
-  highlightCard: {
-    marginTop: 20,
-    borderRadius: 28,
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    padding: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  highlightText: {
-    flex: 1,
-    paddingRight: 12,
-  },
-  highlightTitle: {
-    color: '#DCE2F7',
-    fontFamily: 'serif',
-    fontSize: 17,
-    marginBottom: 4,
-  },
-  highlightSubtitle: {
-    color: '#8F97A8',
-    fontSize: 13,
-  },
-  highlightThumbnail: {
-    width: 74,
-    height: 74,
-    borderRadius: 18,
-    backgroundColor: 'rgba(233, 195, 73, 0.14)',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  thumbnailEmoji: {
-    fontSize: 30,
-  },
-  card: {
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderColor: 'rgba(255,255,255,0.08)',
-    borderWidth: 1,
-    borderRadius: 24,
-    padding: 18,
-  },
-  cardTitle: {
-    color: '#DCE2F7',
-    fontFamily: 'serif',
-    fontSize: 18,
-    marginBottom: 8,
-  },
-  cardText: {
-    color: '#A7B0C4',
-    fontSize: 14,
-    lineHeight: 21,
-  },
-});
+import { useAppSelector, useAppDispatch } from '@hooks/useRedux';
+import { useTheme } from '@hooks/useTheme';
+import { useNavigation } from '@react-navigation/native';
+import { getPrayerTimeCategories } from '@services/prayerCategories.service';
+import { setDarkMode } from '@store/slices/userSlice';
+import { Ionicons } from '@expo/vector-icons';
 
 const HomeScreen = () => {
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
+  const dispatch = useAppDispatch();
+  const navigation = useNavigation<any>();
   const { currentService } = usePrayer();
   const { nextZman, zmanim, userLocation, calendarSummary } = useZmanim();
   const { t } = useI18n();
   const holidays = useAppSelector((state) => state.zmanim.holidays);
+  const preferences = useAppSelector((state) => state.user.preferences);
+  const nusach = preferences.nusach;
+
+  const styles = createStyles(theme);
+
+  const handleStartPrayer = () => {
+    const categories = getPrayerTimeCategories(nusach);
+    const currentCat = categories.find(c => c.timeOfDay === currentService);
+    if (currentCat) {
+      navigation.navigate('Siddur', { category: currentCat });
+    } else {
+      navigation.navigate('Siddur');
+    }
+  };
 
   const nextPrayerLabel =
     currentService === 'shacharit'
-      ? 'Shacharit'
+      ? "Cha'harith"
       : currentService === 'mincha'
-        ? 'Mincha'
-        : 'Arvit';
+        ? "Min'hah"
+        : 'Arvith';
 
   const nextPrayerTime = nextZman
     ? new Date(nextZman.time).toLocaleTimeString('fr-FR', {
@@ -342,7 +82,17 @@ const HomeScreen = () => {
       >
         <View style={styles.header}>
           <Text style={styles.headerTitle}>{t('app.title', 'Siddur')}</Text>
-          <View style={styles.avatar} />
+          <TouchableOpacity 
+            style={styles.avatar} 
+            activeOpacity={0.7}
+            onPress={() => dispatch(setDarkMode(!preferences.isDarkMode))}
+          >
+            <Ionicons 
+              name={preferences.isDarkMode ? "sunny" : "moon"} 
+              size={20} 
+              color={theme.colors.primary} 
+            />
+          </TouchableOpacity>
         </View>
 
         <View style={styles.hero}>
@@ -363,11 +113,15 @@ const HomeScreen = () => {
               <Text style={styles.progressLabel}>Tachnun</Text>
             </View>
             <View style={styles.progressBar}>
-              <View style={styles.progressFill} />
+              <View style={[styles.progressFill, { backgroundColor: theme.colors.primary }]} />
             </View>
           </View>
 
-          <TouchableOpacity style={styles.primaryButton} activeOpacity={0.85}>
+          <TouchableOpacity 
+            style={styles.primaryButton} 
+            activeOpacity={0.85}
+            onPress={handleStartPrayer}
+          >
             <Text style={styles.primaryButtonText}>Commencer</Text>
           </TouchableOpacity>
         </View>
@@ -396,13 +150,13 @@ const HomeScreen = () => {
           <View style={styles.prayerGrid}>
             <View style={styles.prayerCard}>
               <Text style={styles.prayerIcon}>☀</Text>
-              <Text style={styles.prayerTitle}>Alot</Text>
+              <Text style={styles.prayerTitle}>Aube</Text>
               <Text style={styles.prayerSubtitle}>{zmanim ? new Date(zmanim.alot).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '05:12'}</Text>
               <View style={styles.prayerMiniBar}><View style={[styles.prayerMiniFill, { width: '58%' }]} /></View>
             </View>
             <View style={styles.prayerCard}>
               <Text style={styles.prayerIcon}>☀</Text>
-              <Text style={styles.prayerTitle}>Sunrise</Text>
+              <Text style={styles.prayerTitle}>Lever</Text>
               <Text style={styles.prayerSubtitle}>{zmanim ? new Date(zmanim.sunrise).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '06:45'}</Text>
               <View style={styles.prayerMiniBar}><View style={[styles.prayerMiniFill, { width: '34%' }]} /></View>
             </View>
@@ -410,13 +164,13 @@ const HomeScreen = () => {
           <View style={[styles.prayerGrid, { marginTop: 12 }]}>
             <View style={styles.prayerCard}>
               <Text style={styles.prayerIcon}>◔</Text>
-              <Text style={styles.prayerTitle}>Chatzot</Text>
+              <Text style={styles.prayerTitle}>Midi</Text>
               <Text style={styles.prayerSubtitle}>{zmanim ? new Date(zmanim.midday).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '12:30'}</Text>
               <View style={styles.prayerMiniBar}><View style={[styles.prayerMiniFill, { width: '82%' }]} /></View>
             </View>
             <View style={styles.prayerCard}>
               <Text style={styles.prayerIcon}>☾</Text>
-              <Text style={styles.prayerTitle}>Sunset</Text>
+              <Text style={styles.prayerTitle}>Coucher</Text>
               <Text style={styles.prayerSubtitle}>{zmanim ? new Date(zmanim.sunset).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : '17:34'}</Text>
               <View style={styles.prayerMiniBar}><View style={[styles.prayerMiniFill, { width: '46%' }]} /></View>
             </View>
@@ -425,67 +179,310 @@ const HomeScreen = () => {
 
         <View style={styles.section}>
           <View style={styles.sectionTitleRow}>
-            <Text style={styles.sectionTitle}>Common Blessings</Text>
-            <Text style={styles.sectionAction}>View all</Text>
+            <Text style={styles.sectionTitle}>Bénédictions courantes</Text>
+            <Text style={styles.sectionAction}>Voir tout</Text>
           </View>
           <View style={styles.blessingList}>
-            <View style={styles.blessingCard}>
-              <Text style={styles.blessingIcon}>🍽</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.blessingTitle}>Birkat HaMazon</Text>
-                <Text style={styles.blessingSubtitle}>Grace after meals</Text>
+            {[
+              { id: 1, icon: '🍽', title: 'Birkat HaMazon', sub: 'Action de grâce après repas' },
+              { id: 2, icon: '☾', title: 'Kriat Shema Al HaMitah', sub: 'Chema au coucher' },
+              { id: 3, icon: '✈', title: 'Tefilat HaDerech', sub: 'Prière du voyageur' },
+            ].map((item) => (
+              <View key={item.id} style={styles.blessingCard}>
+                <Text style={styles.blessingIcon}>{item.icon}</Text>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.blessingTitle}>{item.title}</Text>
+                  <Text style={styles.blessingSubtitle}>{item.sub}</Text>
+                </View>
+                <Text style={{ color: theme.colors.textSecondary, fontSize: 20 }}>♡</Text>
               </View>
-              <Text style={{ color: '#6E7A92', fontSize: 20 }}>♡</Text>
-            </View>
-            <View style={styles.blessingCard}>
-              <Text style={styles.blessingIcon}>☾</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.blessingTitle}>Kriat Shema Al HaMitah</Text>
-                <Text style={styles.blessingSubtitle}>Bedtime Shema</Text>
-              </View>
-              <Text style={{ color: '#6E7A92', fontSize: 20 }}>♡</Text>
-            </View>
-            <View style={styles.blessingCard}>
-              <Text style={styles.blessingIcon}>✈</Text>
-              <View style={{ flex: 1 }}>
-                <Text style={styles.blessingTitle}>Tefilat HaDerech</Text>
-                <Text style={styles.blessingSubtitle}>Traveler’s Prayer</Text>
-              </View>
-              <Text style={{ color: '#6E7A92', fontSize: 20 }}>♡</Text>
-            </View>
+            ))}
           </View>
         </View>
 
         <View style={styles.section}>
           <View style={styles.sectionTitleRow}>
-            <Text style={styles.sectionTitle}>Special Occasions</Text>
-            <Text style={styles.sectionAction}>{mainHoliday ? 'Today' : 'Upcoming'}</Text>
+            <Text style={styles.sectionTitle}>Occasions spéciales</Text>
+            <Text style={styles.sectionAction}>{mainHoliday ? "Aujourd'hui" : 'À venir'}</Text>
           </View>
           <View style={styles.highlightCard}>
             <View style={styles.highlightText}>
-              <Text style={styles.highlightTitle}>{mainHoliday ? mainHoliday.name : 'Shabbat'}</Text>
-              <Text style={styles.highlightSubtitle}>{mainHoliday ? mainHoliday.nameHe : 'Kiddush & candles'}</Text>
+              <Text style={styles.highlightTitle}>{mainHoliday ? mainHoliday.name : 'Chabbat'}</Text>
+              <Text style={styles.highlightSubtitle}>{mainHoliday ? mainHoliday.nameHe : 'Kiddouch & bougies'}</Text>
             </View>
-            <Text style={{ color: COLORS.secondary, fontSize: 42 }}>🕯</Text>
-          </View>
-        </View>
-
-        <View style={styles.section}>
-          <View style={styles.sectionTitleRow}>
-            <Text style={styles.sectionTitle}>Live note</Text>
-            <Text style={styles.sectionAction}>Real data</Text>
-          </View>
-          <View style={styles.card}>
-            <Text style={styles.cardTitle}>Today’s candle lighting</Text>
-            <Text style={styles.cardText}>{candleTime}</Text>
-            <Text style={styles.cardText}>
-              Data is loaded from Hebcal and Sefaria at runtime, then cached locally.
-            </Text>
+            <Text style={{ color: theme.colors.secondary, fontSize: 42 }}>🕯</Text>
           </View>
         </View>
       </ScrollView>
     </View>
   );
 };
+
+const createStyles = (theme: any) => StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  backdropTop: {
+    position: 'absolute',
+    top: -80,
+    right: -60,
+    width: 260,
+    height: 260,
+    borderRadius: 130,
+    backgroundColor: theme.colors.highlight,
+  },
+  backdropBottom: {
+    position: 'absolute',
+    bottom: 80,
+    left: -80,
+    width: 240,
+    height: 240,
+    borderRadius: 120,
+    backgroundColor: theme.colors.card,
+    opacity: 0.5,
+  },
+  scroll: {
+    flex: 1,
+  },
+  content: {
+    paddingHorizontal: 20,
+    paddingBottom: 120,
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingTop: 14,
+    paddingBottom: 18,
+  },
+  headerTitle: {
+    color: theme.colors.primary,
+    fontSize: 22,
+    letterSpacing: 1.2,
+    fontWeight: '700',
+    fontFamily: 'serif',
+  },
+  avatar: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.card,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  hero: {
+    backgroundColor: theme.colors.card,
+    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderRadius: 28,
+    padding: 22,
+    ...theme.shadows.md,
+  },
+  heroLabel: {
+    color: theme.colors.secondary,
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 2,
+    textTransform: 'uppercase',
+    marginBottom: 8,
+  },
+  heroRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
+  },
+  heroService: {
+    fontSize: 30,
+    color: theme.colors.text,
+    fontFamily: 'serif',
+    fontWeight: '700',
+  },
+  heroTime: {
+    fontSize: 22,
+    color: theme.colors.textSecondary,
+    textAlign: 'right',
+    fontWeight: '700',
+  },
+  heroMeta: {
+    color: theme.colors.textSecondary,
+    textAlign: 'right',
+    marginTop: 4,
+    fontSize: 12,
+  },
+  progressWrap: {
+    marginTop: 18,
+  },
+  progressLabelRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 8,
+  },
+  progressLabel: {
+    color: theme.colors.textSecondary,
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  progressBar: {
+    height: 2,
+    borderRadius: 999,
+    backgroundColor: theme.colors.border,
+    overflow: 'hidden',
+  },
+  progressFill: {
+    width: '62%',
+    height: '100%',
+  },
+  primaryButton: {
+    marginTop: 18,
+    borderRadius: 20,
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 14,
+    alignItems: 'center',
+    ...theme.shadows.sm,
+  },
+  primaryButtonText: {
+    color: theme.colors.background,
+    fontSize: 15,
+    fontWeight: '800',
+  },
+  section: {
+    marginTop: 22,
+  },
+  sectionTitleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  sectionTitle: {
+    color: theme.colors.text,
+    fontSize: 16,
+    fontFamily: 'serif',
+    fontWeight: '600',
+  },
+  sectionAction: {
+    color: theme.colors.secondary,
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  prayerGrid: {
+    flexDirection: 'row',
+    gap: 12,
+  },
+  prayerCard: {
+    flex: 1,
+    minHeight: 132,
+    borderRadius: 26,
+    backgroundColor: theme.colors.card,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    padding: 16,
+  },
+  prayerIcon: {
+    fontSize: 22,
+    color: theme.colors.secondary,
+    marginBottom: 18,
+  },
+  prayerTitle: {
+    color: theme.colors.text,
+    fontFamily: 'serif',
+    fontSize: 20,
+    marginBottom: 3,
+  },
+  prayerSubtitle: {
+    color: theme.colors.secondary,
+    fontSize: 11,
+    letterSpacing: 1.1,
+    textTransform: 'uppercase',
+  },
+  prayerMiniBar: {
+    marginTop: 16,
+    height: 3,
+    borderRadius: 999,
+    backgroundColor: theme.colors.border,
+  },
+  prayerMiniFill: {
+    height: '100%',
+    borderRadius: 999,
+    backgroundColor: theme.colors.secondary,
+  },
+  blessingList: {
+    gap: 10,
+  },
+  blessingCard: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    borderRadius: 18,
+    backgroundColor: theme.colors.card,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  blessingIcon: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: theme.colors.highlight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 12,
+    color: theme.colors.textSecondary,
+    fontSize: 18,
+    textAlign: 'center',
+    lineHeight: 38,
+  },
+  blessingTitle: {
+    color: theme.colors.text,
+    fontSize: 15,
+    fontWeight: '600',
+  },
+  blessingSubtitle: {
+    color: theme.colors.textSecondary,
+    fontSize: 12,
+    marginTop: 2,
+  },
+  highlightCard: {
+    marginTop: 4,
+    borderRadius: 28,
+    backgroundColor: theme.colors.card,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    padding: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    ...theme.shadows.sm,
+  },
+  highlightText: {
+    flex: 1,
+    paddingRight: 12,
+  },
+  highlightTitle: {
+    color: theme.colors.text,
+    fontFamily: 'serif',
+    fontSize: 17,
+    marginBottom: 4,
+  },
+  highlightSubtitle: {
+    color: theme.colors.textSecondary,
+    fontSize: 13,
+  },
+  highlightThumbnail: {
+    width: 74,
+    height: 74,
+    borderRadius: 18,
+    backgroundColor: theme.colors.highlight,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  thumbnailEmoji: {
+    fontSize: 30,
+  },
+});
 
 export default HomeScreen;

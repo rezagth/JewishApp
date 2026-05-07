@@ -82,10 +82,15 @@ export class ZmanService {
     date: Dayjs,
     location: Location
   ): Promise<ZmanDetails> {
-    const tzid =
+    let tzid =
       location.timezone ||
       Intl.DateTimeFormat().resolvedOptions().timeZone ||
       'UTC';
+
+    // Fix pour Hebcal: tzid ne doit pas être "UTC+0" mais "UTC" ou un format IANA
+    if (tzid.startsWith('UTC')) {
+      tzid = 'UTC';
+    }
 
     const url = new URL('/zmanim', HEBCAL_BASE_URL);
     url.searchParams.set('cfg', 'json');
@@ -145,12 +150,17 @@ export class ZmanService {
    */
   static async getCalendarSummary(
     date: Dayjs,
-    location: Location
+    location: Location,
+    endDate?: Dayjs
   ): Promise<CalendarSummary> {
-    const tzid =
+    let tzid =
       location.timezone ||
       Intl.DateTimeFormat().resolvedOptions().timeZone ||
       'UTC';
+
+    if (tzid.startsWith('UTC')) {
+      tzid = 'UTC';
+    }
 
     const url = new URL('/hebcal', HEBCAL_BASE_URL);
     url.searchParams.set('v', '1');
@@ -162,7 +172,7 @@ export class ZmanService {
     url.searchParams.set('ss', 'on');
     url.searchParams.set('d', 'on');
     url.searchParams.set('start', date.format('YYYY-MM-DD'));
-    url.searchParams.set('end', date.format('YYYY-MM-DD'));
+    url.searchParams.set('end', (endDate || date).format('YYYY-MM-DD'));
     url.searchParams.set('i', isLikelyIsrael(location) ? 'on' : 'off');
 
     try {
@@ -246,12 +256,12 @@ export class ZmanService {
     const now = new Date();
 
     const times = [
-      { name: 'Alot Hashachar', time: new Date(zmanim.alot) },
-      { name: 'Sunrise', time: new Date(zmanim.sunrise) },
-      { name: 'Sof Zman Shema', time: new Date(zmanim.sof_zman_shema) },
-      { name: 'Sof Zman Tefilla', time: new Date(zmanim.sof_zman_tefilla) },
-      { name: 'Sunset', time: new Date(zmanim.sunset) },
-      { name: 'Tzait Hakochavim', time: new Date(zmanim.tzait_stars) },
+      { name: "Alot HaChachar (Aube)", time: new Date(zmanim.alot) },
+      { name: "Lever du soleil", time: new Date(zmanim.sunrise) },
+      { name: "Fin du Chéma", time: new Date(zmanim.sof_zman_shema) },
+      { name: "Fin de la Téfila", time: new Date(zmanim.sof_zman_tefilla) },
+      { name: "Coucher du soleil", time: new Date(zmanim.sunset) },
+      { name: "Tzeit Hakochavim", time: new Date(zmanim.tzait_stars) },
     ];
 
     const futureTime = times.find((t) => t.time > now);

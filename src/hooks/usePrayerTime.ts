@@ -49,8 +49,8 @@ export const usePrayerTime = (): {
         endTime: sunset,
       },
       {
-        name: "Ma'ariv",
-        nameHe: "מעריב",
+        name: 'Maariv',
+        nameHe: 'מעריב',
         startTime: sunset,
         endTime: tzaitStars.add(1, 'hour'), // Un peu après tzait
       },

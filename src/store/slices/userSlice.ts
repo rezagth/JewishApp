@@ -25,7 +25,11 @@ const initialState: UserState = {
     fontSize: 1,
     isDarkMode: false,
     timezone: 'UTC',
-    enableNotifications: true,
+    notifications: {
+      shacharit: true,
+      mincha: true,
+      arvit: true,
+    },
   },
 };
 
@@ -59,8 +63,11 @@ const userSlice = createSlice({
     setTimezone: (state, action: PayloadAction<string>) => {
       state.preferences.timezone = action.payload;
     },
-    setNotifications: (state, action: PayloadAction<boolean>) => {
-      state.preferences.enableNotifications = action.payload;
+    setNotifications: (
+      state,
+      action: PayloadAction<{ key: keyof UserPreferences['notifications']; value: boolean }>
+    ) => {
+      state.preferences.notifications[action.payload.key] = action.payload.value;
     },
     clearUser: (state) => {
       state.currentUser = null;
