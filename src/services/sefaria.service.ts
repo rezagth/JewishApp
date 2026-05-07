@@ -76,84 +76,74 @@ export interface PrayerCategory {
 
 export const PRAYER_CATEGORIES: PrayerCategory[] = [
   {
-    id: 'tehillim',
-    titleHe: 'ספר תהילים',
-    titleFr: 'Livre des psaumes',
-    sefariaRef: 'Psalms',
+    id: 'preparatory',
+    titleHe: 'סדר השכמת הבוקר',
+    titleFr: 'Prières du matin (Préparatoires)',
+    emoji: '🧼',
+    sefariaRef: 'Siddur Edot HaMizrach, Preparatory Prayers',
   },
   {
     id: 'birkat_hamazon',
     titleHe: 'ברכת המזון',
     titleFr: 'Birkat Hamazon',
-    sefariaRef: 'Birkat Hamazon',
+    emoji: '🍽️',
+    sefariaRef: 'Siddur Edot HaMizrach, Post Meal Blessing',
   },
   {
-    id: 'meen_shalosh',
-    titleHe: 'מעין שלוש',
-    titleFr: 'Meen Chaloch',
-    staticHe:
-      'עַל הַמִּחְיָה וְעַל הַכַּלְכָּלָה וְעַל תְּנוּבַת הַשָּׂדֶה\nוְעַל אֶרֶץ חֶמְדָּה טוֹבָה וּרְחָבָה\nשֶׁרָצִיתָ וְהִנְחַלְתָּ לַאֲבוֹתֵינוּ\nלֶאֱכוֹל מִפִּרְיָהּ וְלִשְׂבּוֹעַ מִטּוּבָהּ',
+    id: 'kriat_shema_amita',
+    titleHe: 'קריאת שמע שעל המיטה',
+    titleFr: 'Kriat Chema au coucher',
+    emoji: '🛌',
+    sefariaRef: 'Siddur Edot HaMizrach, Bedtime Shema',
   },
   {
-    id: 'kadish_yehe_shelama',
-    titleHe: 'קדיש יהא שלמא',
-    titleFr: 'Kadich Yehe Chelama',
-    staticHe:
-      'יִתְגַּדַּל וְיִתְקַדַּשׁ שְׁמֵהּ רַבָּא\nבְּעָלְמָא דִּי בְרָא כִרְעוּתֵהּ\nוְיַמְלִיךְ מַלְכוּתֵהּ\nבְּחַיֵּיכוֹן וּבְיוֹמֵיכוֹן\nוּבְחַיֵּי דְכָל בֵּית יִשְׂרָאֵל\nבַּעֲגָלָא וּבִזְמַן קָרִיב\nוְאִמְרוּ אָמֵן\nיְהֵא שְׁמֵהּ רַבָּא מְבָרַךְ\nלְעָלַם וּלְעָלְמֵי עָלְמַיָּא',
+    id: 'shabbat_evening',
+    titleHe: 'סדר ליל שבת',
+    titleFr: 'Chabbat Soir',
+    emoji: '🕯️',
+    sefariaRef: 'Siddur Edot HaMizrach, Shabbat Arvit, Barchu,Siddur Edot HaMizrach, Shabbat Arvit, The Shema,Siddur Edot HaMizrach, Shabbat Arvit, Magen Avot,Siddur Edot HaMizrach, Shabbat Arvit, Alenu,Siddur Edot HaMizrach, Shabbat Evening, Shalom Alekhem,Siddur Edot HaMizrach, Shabbat Evening, Eshet Hayil,Siddur Edot HaMizrach, Shabbat Evening, Kiddush',
   },
   {
-    id: 'kadish_al_israel',
-    titleHe: 'קדיש על ישראל',
-    titleFr: 'Kadich Al Israel',
-    staticHe:
-      'יִתְגַּדַּל וְיִתְקַדַּשׁ שְׁמֵהּ רַבָּא\nבְּעָלְמָא דִּי בְרָא כִרְעוּתֵהּ\nוְיַמְלִיךְ מַלְכוּתֵהּ\nעַל יִשְׂרָאֵל וְעַל כָּל יוֹשְׁבֵי תֵבֵל\nבְּחַיֵּיכוֹן וּבְיוֹמֵיכוֹן\nוּבְחַיֵּי דְכָל בֵּית יִשְׂרָאֵל\nבַּעֲגָלָא וּבִזְמַן קָרִיב\nוְאִמְרוּ אָמֵן',
+    id: 'shabbat_shacharit',
+    titleHe: 'שחרית של שבת',
+    titleFr: 'Chabbat Matin',
+    emoji: '⛪',
+    sefariaRef: 'Siddur Edot HaMizrach, Shabbat Shacharit, Psalms for Shabbat,Siddur Edot HaMizrach, Shabbat Shacharit, Pesukei D\'Zimra,Siddur Edot HaMizrach, Shabbat Shacharit, The Shema,Siddur Edot HaMizrach, Shabbat Shacharit, Amidah',
   },
   {
-    id: 'hallel_moussaf',
-    titleHe: 'הלל ומוסף לראש חודש',
-    titleFr: 'Hallel et moussaf',
-    sefariaRef: 'Psalms.113',
+    id: 'shabbat_mussaf',
+    titleHe: 'מוסף של שבת',
+    titleFr: 'Chabbat Moussaf',
+    emoji: '🍷',
+    sefariaRef: 'Siddur Edot HaMizrach, Shabbat Mussaf, Amida,Siddur Edot HaMizrach, Shabbat Mussaf, Incense Offering,Siddur Edot HaMizrach, Shabbat Mussaf, Alenu',
   },
   {
-    id: 'perek_shira',
-    titleHe: 'פרק שירה',
-    titleFr: 'Perek Chira',
-    staticHe:
-      'הַשָּׁמַיִם אוֹמְרִים\nהַשָּׁמַיִם מְסַפְּרִים כְּבוֹד אֵל\nוּמַעֲשֵׂה יָדָיו מַגִּיד הָרָקִיעַ\nהָאָרֶץ אוֹמֶרֶת\nלַה׳ הָאָרֶץ וּמְלוֹאָהּ\nתֵּבֵל וְיֹשְׁבֵי בָהּ\nהַגָּן אוֹמֵר\nיָקוּם אֱלֹהִים יָפוּצוּ אוֹיְבָיו',
+    id: 'havdala',
+    titleHe: 'סדר הבדלה',
+    titleFr: 'Havdala',
+    emoji: '🕯️',
+    sefariaRef: 'Siddur Edot HaMizrach, Havdalah',
+  },
+  {
+    id: 'tehillim',
+    titleHe: 'ספר תהילים',
+    titleFr: 'Livre des psaumes',
+    emoji: '📖',
+    sefariaRef: 'Psalms',
+  },
+  {
+    id: 'tefila_haderech',
+    titleHe: 'תפילת הדרך',
+    titleFr: 'Tefila Haderech',
+    emoji: '✈️',
+    sefariaRef: 'Siddur Edot HaMizrach, Assorted Blessings and Prayers, Traveler\'s Prayer',
   },
   {
     id: 'tikoun_haklali',
     titleHe: 'תיקון הכללי',
     titleFr: 'Tikoun Haklali',
     emoji: '🔥',
-    sefariaRef: 'Psalms.16',
-  },
-  {
-    id: 'kriat_shema_amita',
-    titleHe: 'קריאת שמע על המיטה',
-    titleFr: 'Kriat Chema al amita',
-    sefariaRef: 'Deuteronomy.6.4-9',
-  },
-  {
-    id: 'tikoun_hatzot',
-    titleHe: 'תיקון חצות',
-    titleFr: 'Tikoun Hatzot',
-    staticHe:
-      'עַל נַהֲרוֹת בָּבֶל שָׁם יָשַׁבְנוּ גַּם בָּכִינוּ\nבְּזָכְרֵנוּ אֶת צִיּוֹן\nעַל עֲרָבִים בְּתוֹכָהּ תָּלִינוּ כִּנֹּרוֹתֵינוּ\nכִּי שָׁם שְׁאֵלוּנוּ שׁוֹבֵינוּ דִּבְרֵי שִׁיר\nוְתוֹלָלֵינוּ שִׂמְחָה\nשִׁירוּ לָנוּ מִשִּׁיר צִיּוֹן',
-  },
-  {
-    id: 'tefila_haderech',
-    titleHe: 'תפילת הדרך',
-    titleFr: 'Tefila Haderech',
-    staticHe:
-      'יְהִי רָצוֹן מִלְּפָנֶיךָ\nה׳ אֱלֹהֵינוּ וֵאלֹהֵי אֲבוֹתֵינוּ\nשֶׁתּוֹלִיכֵנוּ לְשָׁלוֹם\nוְתַצְעִידֵנוּ לְשָׁלוֹם\nוְתַדְרִיכֵנוּ לְשָׁלוֹם\nוְתִסְמְכֵנוּ לְשָׁלוֹם\nוְתַגִּיעֵנוּ לִמְחוֹז חֶפְצֵנוּ לְחַיִּים\nוּלְשִׂמְחָה וּלְשָׁלוֹם',
-  },
-  {
-    id: 'havdala',
-    titleHe: 'הבדלה',
-    titleFr: 'Havdala',
-    staticHe:
-      'הִנֵּה אֵל יְשׁוּעָתִי\nאֶבְטַח וְלֹא אֶפְחָד\nכִּי עָזִּי וְזִמְרָת יָהּ ה׳\nוַיְהִי לִי לִישׁוּעָה\nוּשְׁאַבְתֶּם מַיִם בְּשָׂשׂוֹן\nמִמַּעַיְנֵי הַיְשׁוּעָה\nלַה׳ הַיְשׁוּעָה\nעַל עַמְּךָ בִרְכָתֶךָ סֶּלָה',
+    sefariaRef: 'Psalms.16,Psalms.32,Psalms.41,Psalms.42,Psalms.59,Psalms.77,Psalms.90,Psalms.105,Psalms.137,Psalms.150',
   },
 ];
 
@@ -166,29 +156,30 @@ export interface PrayerTimeCategory extends PrayerCategory {
 export const PRAYER_TIME_CATEGORIES: PrayerTimeCategory[] = [
   {
     id: 'shacharit_service',
-    titleHe: 'שחרית',
-    titleFr: 'Chaharith (Matin)',
+    titleHe: 'שחרית לימי החול',
+    titleFr: 'Chaharith (Semaine)',
     emoji: '🌅',
     timeOfDay: 'shacharit',
-    sefariaRef: 'Psalms.113-150', // Hallel matinal
+    sefariaRef: 'Siddur Edot HaMizrach, Weekday Shacharit, Morning Prayer,Siddur Edot HaMizrach, Weekday Shacharit, Incense Offering,Siddur Edot HaMizrach, Weekday Shacharit, Hodu,Siddur Edot HaMizrach, Weekday Shacharit, Pesukei D\'Zimra,Siddur Edot HaMizrach, Weekday Shacharit, The Shema,Siddur Edot HaMizrach, Weekday Shacharit, Amida,Siddur Edot HaMizrach, Weekday Shacharit, Vidui,Siddur Edot HaMizrach, Weekday Shacharit, Torah Reading,Siddur Edot HaMizrach, Weekday Shacharit, Ashrei,Siddur Edot HaMizrach, Weekday Shacharit, Uva LeSion,Siddur Edot HaMizrach, Weekday Shacharit, Alenu',
   },
   {
     id: 'mincha_service',
-    titleHe: 'מנחה',
-    titleFr: 'Mincha (Après-midi)',
+    titleHe: 'מנחה לימי החול',
+    titleFr: 'Mincha (Semaine)',
     emoji: '☀️',
     timeOfDay: 'mincha',
-    sefariaRef: 'Psalms.84',
+    sefariaRef: 'Siddur Edot HaMizrach, Weekday Mincha, Offerings,Siddur Edot HaMizrach, Weekday Mincha, Amida,Siddur Edot HaMizrach, Weekday Mincha, Vidui,Siddur Edot HaMizrach, Weekday Mincha, Alenu',
   },
   {
     id: 'maariv_service',
-    titleHe: 'מעריב',
-    titleFr: "Ma'ariv (Soirée)",
+    titleHe: 'ערבית לימי החול',
+    titleFr: 'Arvit (Semaine)',
     emoji: '🌙',
     timeOfDay: 'maariv',
-    sefariaRef: 'Psalms.4',
+    sefariaRef: 'Siddur Edot HaMizrach, Weekday Arvit, Barchu,Siddur Edot HaMizrach, Weekday Arvit, The Shema,Siddur Edot HaMizrach, Weekday Arvit, Amidah,Siddur Edot HaMizrach, Weekday Arvit, Alenu',
   },
 ];
+
 
 // Récupère les psaumes individuels (1-150) pour le livre des psaumes
 export const fetchPsalm = async (psalmNumber: number): Promise<SefariaText> => {

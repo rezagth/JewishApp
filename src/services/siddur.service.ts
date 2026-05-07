@@ -1,10 +1,10 @@
 /**
  * Service pour gérer les prières du Siddur
- * Gère le contenu liturgique, les nusach différents, et l'affichage conditionnel.
+ * Version corrigée et stable (Sefaria API)
  */
 
 import axios from 'axios';
-import { Prayer, ServiceType, Nusach } from '@types/index';
+import { Prayer, ServiceType, Nusach } from '../types';
 
 interface PrayerTemplate {
   id: string;
@@ -14,260 +14,220 @@ interface PrayerTemplate {
   serviceType: ServiceType;
 }
 
-const PRAYER_TEMPLATES: Record<ServiceType, PrayerTemplate[]> = {
-  shacharit: [
-    {
-      id: 'ashrei',
-      title: 'Ashrei',
-      titleHe: 'אשרי',
-      ref: 'Psalms.145',
-      serviceType: 'shacharit',
-    },
-    {
-      id: 'shema',
-      title: 'Shema',
-      titleHe: 'שמע',
-      ref: 'Deuteronomy.6.4-9',
-      serviceType: 'shacharit',
-    },
-    {
-      id: 'vayomer',
-      title: 'Vayomer',
-      titleHe: 'ויאמר',
-      ref: 'Numbers.15.37-41',
-      serviceType: 'shacharit',
-    },
-  ],
-  mincha: [
-    {
-      id: 'ashrei-mincha',
-      title: 'Ashrei',
-      titleHe: 'אשרי',
-      ref: 'Psalms.145',
-      serviceType: 'mincha',
-    },
-    {
-      id: 'tehillim-130',
-      title: 'Shir HaMaalot',
-      titleHe: 'שיר המעלות',
-      ref: 'Psalms.130',
-      serviceType: 'mincha',
-    },
-  ],
-  arvit: [
-    {
-      id: 'shema-arvit',
-      title: 'Shema',
-      titleHe: 'שמע',
-      ref: 'Deuteronomy.6.4-9',
-      serviceType: 'arvit',
-    },
-    {
-      id: 'psalm-91',
-      title: 'Psalm 91',
-      titleHe: 'יושב בסתר עליון',
-      ref: 'Psalms.91',
-      serviceType: 'arvit',
-    },
-  ],
-  "ma'ariv": [
-    {
-      id: 'shema-maariv',
-      title: 'Shema',
-      titleHe: 'שמע',
-      ref: 'Deuteronomy.6.4-9',
-      serviceType: "ma'ariv",
-    },
-    {
-      id: 'psalm-121',
-      title: 'Psalm 121',
-      titleHe: 'שיר למעלות',
-      ref: 'Psalms.121',
-      serviceType: "ma'ariv",
-    },
-  ],
+interface SefariaSection {
+  ref: string;
+  title: string;
+  heTitle: string;
+}
+
+// 🔥 Bases Siddur
+const SIDDUR_BASE: Record<Nusach, string> = {
+  ashkenazi: 'Siddur Ashkenaz',
+  sephardic: 'Siddur Edot HaMizrach',
+  mizrahi: 'Siddur Edot HaMizrach',
+  teimani: 'Siddur Edot HaMizrach', // Simplification pour le moment
 };
 
+// 🔥 STRUCTURE CORRIGÉE
+const SEFARIA_SIDDUR_STRUCTURE: Record<
+  ServiceType,
+  (nusach: Nusach) => SefariaSection[]
+> = {
+  shacharit: (nusach) => {
+    if (nusach === 'ashkenazi') {
+      return [
+        { ref: 'Siddur Ashkenaz, Weekday, Shacharit, Preparatory Prayers, Morning Blessings', title: 'Morning Blessings', heTitle: 'ברכות השחר' },
+        { ref: 'Siddur Ashkenaz, Weekday, Shacharit, Pesukei Dezimra', title: 'Pesukei Dezimra', heTitle: 'פסוקי דזמרה' },
+        { ref: 'Siddur Ashkenaz, Weekday, Shacharit, Blessings of the Shema', title: 'Shema', heTitle: 'שמע ישראל' },
+        { ref: 'Siddur Ashkenaz, Weekday, Shacharit, Amidah', title: 'Amidah', heTitle: 'עמידה' },
+      ];
+    }
+    return [
+      { ref: 'Siddur Edot HaMizrach, Weekday Shacharit, Preparatory Prayers', title: 'Morning Blessings', heTitle: 'ברכות השחר' },
+      { ref: 'Siddur Edot HaMizrach, Weekday Shacharit, Pesukei D\'Zimra', title: 'Pesukei Dezimra', heTitle: 'פסוקי דזמרה' },
+      { ref: 'Siddur Edot HaMizrach, Weekday Shacharit, The Shema', title: 'Shema', heTitle: 'שמע ישראל' },
+      { ref: 'Siddur Edot HaMizrach, Weekday Shacharit, Amida', title: 'Amidah', heTitle: 'עמידה' },
+    ];
+  },
+
+  mincha: (nusach) => {
+    if (nusach === 'ashkenazi') {
+      return [
+        { ref: 'Siddur Ashkenaz, Weekday, Minchah, Ashrei', title: 'Ashrei', heTitle: 'אשרי' },
+        { ref: 'Siddur Ashkenaz, Weekday, Minchah, Amida', title: 'Amidah', heTitle: 'עמידה' },
+        { ref: 'Siddur Ashkenaz, Weekday, Minchah, Concluding Prayers, Alenu', title: 'Aleinu', heTitle: 'עלינו' },
+      ];
+    }
+    return [
+      { ref: 'Siddur Edot HaMizrach, Weekday Mincha, Offerings', title: 'Ashrei', heTitle: 'אשרי' },
+      { ref: 'Siddur Edot HaMizrach, Weekday Mincha, Amida', title: 'Amidah', heTitle: 'עמידה' },
+      { ref: 'Siddur Edot HaMizrach, Weekday Mincha, Alenu', title: 'Aleinu', heTitle: 'עלינו' },
+    ];
+  },
+
+  arvit: (nusach) => {
+    if (nusach === 'ashkenazi') {
+      return [
+        { ref: 'Siddur Ashkenaz, Weekday, Maariv, Blessings of the Shema', title: 'Shema', heTitle: 'שמע ישראל' },
+        { ref: 'Siddur Ashkenaz, Weekday, Maariv, Amidah', title: 'Amidah', heTitle: 'עמידה' },
+        { ref: 'Siddur Ashkenaz, Weekday, Maariv, Alenu', title: 'Aleinu', heTitle: 'עלינו' },
+      ];
+    }
+    return [
+      { ref: 'Siddur Edot HaMizrach, Weekday Arvit, The Shema', title: 'Shema', heTitle: 'שמע ישראל' },
+      { ref: 'Siddur Edot HaMizrach, Weekday Arvit, Amidah', title: 'Amidah', heTitle: 'עמידה' },
+      { ref: 'Siddur Edot HaMizrach, Weekday Arvit, Alenu', title: 'Aleinu', heTitle: 'עלינו' },
+    ];
+  },
+
+  "ma'ariv": (nusach) => {
+    if (nusach === 'ashkenazi') {
+      return [
+        { ref: 'Siddur Ashkenaz, Weekday, Maariv, Blessings of the Shema', title: 'Shema', heTitle: 'שמע ישראל' },
+        { ref: 'Siddur Ashkenaz, Weekday, Maariv, Amidah', title: 'Amidah', heTitle: 'עמידה' },
+      ];
+    }
+    return [
+      { ref: 'Siddur Edot HaMizrach, Weekday Arvit, The Shema', title: 'Shema', heTitle: 'שמע ישראל' },
+      { ref: 'Siddur Edot HaMizrach, Weekday Arvit, Amidah', title: 'Amidah', heTitle: 'עמידה' },
+    ];
+  },
+};
+
+// 🔁 Cache
 const PRAYER_CACHE = new Map<string, Prayer[]>();
 
+// 🧠 Nettoyage texte
 const flattenText = (value: unknown): string => {
   if (Array.isArray(value)) {
-    return value.flat(Infinity).filter(Boolean).join(' ').replace(/\s+/g, ' ').trim();
+    return value.flat(Infinity).filter(Boolean).join('\n');
   }
-
-  if (typeof value === 'string') {
-    return value.replace(/\s+/g, ' ').trim();
-  }
-
+  if (typeof value === 'string') return value;
   return '';
 };
 
-const fetchSefariaText = async (
-  ref: string
+// 🔁 Retry automatique
+const fetchWithRetry = async (
+  ref: string,
+  retries = 2
 ): Promise<{ he: string; en: string }> => {
-  const url = new URL(`https://www.sefaria.org/api/texts/${encodeURIComponent(ref)}`);
-  url.searchParams.set('context', '0');
-  url.searchParams.set('commentary', '0');
-  url.searchParams.set('pad', '0');
-  url.searchParams.set('lang', 'he');
-  url.searchParams.set('lang2', 'en');
+  try {
+    const url = new URL(
+      `https://www.sefaria.org/api/texts/${encodeURIComponent(ref)}`
+    );
 
-  const response = await axios.get(url.toString(), { timeout: 12000 });
-  const data = response.data;
+    url.searchParams.set('context', '0');
+    url.searchParams.set('commentary', '0');
+    url.searchParams.set('pad', '0');
 
-  return {
-    he: flattenText(data.he || data.hebrew || data.text || data.heTexts),
-    en: flattenText(data.text || data.en || data.texts || data.textEnglish),
-  };
+    const response = await axios.get(url.toString(), { timeout: 10000 });
+    const data = response.data;
+
+    return {
+      he: flattenText(data.he || data.hebrew),
+      en: flattenText(data.text || data.en),
+    };
+  } catch (err: any) {
+    if (retries > 0 && err.response?.status >= 500) {
+      return fetchWithRetry(ref, retries - 1);
+    }
+    throw err;
+  }
 };
 
-const buildFallbackPrayer = (template: PrayerTemplate): Prayer => {
-  return {
-    id: template.id,
-    title: template.title,
-    titleHe: template.titleHe,
-    content: `${template.title} text unavailable offline.`,
-    contentHe: `${template.titleHe} - טקסט זמין במצב offline`,
-    serviceType: template.serviceType,
-    nusach: 'ashkenazi',
-  };
-};
+// 🧱 Fallback template
+const buildFallbackPrayer = (
+  section: SefariaSection,
+  serviceType: ServiceType,
+  nusach: Nusach,
+  index: number
+): Prayer => ({
+  id: `${serviceType}:${index}`,
+  title: section.title,
+  titleHe: section.heTitle,
+  content: `${section.title} unavailable`,
+  contentHe: `${section.heTitle} לא זמין`,
+  serviceType,
+  nusach,
+});
 
 export class SiddurService {
-  /**
-   * Récupère les prières pour un service spécifique et nusach
-   */
-  static async getPrayers(
+  static async getCompleteSiddur(
     serviceType: ServiceType,
     nusach: Nusach
   ): Promise<Prayer[]> {
-    try {
-      const cacheKey = `${serviceType}:${nusach}`;
-      const cached = PRAYER_CACHE.get(cacheKey);
-      if (cached) {
-        return cached;
-      }
+    const cacheKey = `${serviceType}:${nusach}`;
+    if (PRAYER_CACHE.has(cacheKey)) {
+      return PRAYER_CACHE.get(cacheKey)!;
+    }
 
-      const templates = PRAYER_TEMPLATES[serviceType];
-      const prayers = await Promise.all(
-        templates.map(async (template) => {
+    const sections = SEFARIA_SIDDUR_STRUCTURE[serviceType](nusach);
+
+    const prayers = await Promise.all(
+      sections.map(async (section, index) => {
+        try {
+          const text = await fetchWithRetry(section.ref);
+
+          return {
+            id: `${serviceType}:${index}`,
+            title: section.title,
+            titleHe: section.heTitle,
+            content: text.en || section.title,
+            contentHe: text.he || section.heTitle,
+            serviceType,
+            nusach,
+          } satisfies Prayer;
+        } catch (error: any) {
+          console.warn('Fallback:', section.ref, error?.response?.status);
+
+          // fallback vers service complet
           try {
-            const text = await fetchSefariaText(template.ref);
+            const base = SIDDUR_BASE[nusach];
+            const fallback = await fetchWithRetry(
+              `${base}, ${serviceType}`
+            );
 
             return {
-              id: template.id,
-              title: template.title,
-              titleHe: template.titleHe,
-              content: text.en || template.title,
-              contentHe: text.he || template.titleHe,
+              id: `${serviceType}:${index}`,
+              title: section.title,
+              titleHe: section.heTitle,
+              content: fallback.en,
+              contentHe: fallback.he,
               serviceType,
               nusach,
             } satisfies Prayer;
-          } catch (error) {
-            console.warn(`Fallback prayer for ${template.ref}:`, error);
-            return buildFallbackPrayer(template);
+          } catch {
+            return buildFallbackPrayer(section, serviceType, nusach, index);
           }
-        })
-      );
-
-      PRAYER_CACHE.set(cacheKey, prayers);
-      return prayers;
-    } catch (error) {
-      console.error('Erreur lors du chargement des prières:', error);
-      return PRAYER_TEMPLATES[serviceType].map(buildFallbackPrayer);
-    }
-  }
-
-  /**
-   * Récupère une prière spécifique par ID
-   */
-  static async getPrayerById(prayerId: string): Promise<Prayer | null> {
-    try {
-      for (const serviceType of Object.keys(PRAYER_TEMPLATES) as ServiceType[]) {
-        const prayers = await this.getPrayers(serviceType, 'ashkenazi');
-        const prayer = prayers.find((p) => p.id === prayerId);
-        if (prayer) {
-          return prayer;
         }
-      }
-      return null;
-    } catch (error) {
-      console.error('Erreur lors du chargement de la prière:', error);
-      throw error;
-    }
+      })
+    );
+
+    PRAYER_CACHE.set(cacheKey, prayers);
+    return prayers;
   }
 
-  /**
-   * Récupère le contenu d'une prière avec les brachot
-   */
-  static async getPrayerContent(
-    prayerId: string,
-    language: 'he' | 'en' | 'fr'
-  ): Promise<string> {
-    const prayer = await this.getPrayerById(prayerId);
-    if (!prayer) return '';
-
-    const content = language === 'he' ? prayer.contentHe : prayer.content;
-
-    // Ajouter les brachot si présentes
-    if (prayer.brachot) {
-      const beforeBrachot = prayer.brachot
-        .filter((b) => b.type === 'before')
-        .map((b) => (language === 'he' ? b.contentHe : b.content))
-        .join('\n\n');
-
-      const afterBrachot = prayer.brachot
-        .filter((b) => b.type === 'after')
-        .map((b) => (language === 'he' ? b.contentHe : b.content))
-        .join('\n\n');
-
-      return `${beforeBrachot}\n\n${content}\n\n${afterBrachot}`;
-    }
-
-    return content;
-  }
-
-  /**
-   * Recherche des prières par terme
-   */
-  static async searchPrayers(query: string, nusach: Nusach): Promise<Prayer[]> {
-    const results: Prayer[] = [];
-    const lowerQuery = query.toLowerCase();
-
-    for (const serviceType of Object.keys(PRAYER_TEMPLATES) as ServiceType[]) {
-      const prayers = await this.getPrayers(serviceType, nusach);
-      const matched = prayers.filter(
-        (p) =>
-          p.title.toLowerCase().includes(lowerQuery) ||
-          p.titleHe.toLowerCase().includes(lowerQuery)
+  static async getPrayerById(id: string): Promise<Prayer | null> {
+    for (const serviceType of Object.keys(
+      SEFARIA_SIDDUR_STRUCTURE
+    ) as ServiceType[]) {
+      const prayers = await this.getCompleteSiddur(
+        serviceType,
+        'ashkenazi'
       );
-      results.push(...matched);
+      const found = prayers.find((p) => p.id === id);
+      if (found) return found;
     }
-
-    return results;
+    return null;
   }
 
-  /**
-   * Retourne les prières associées pour un service (ex: Shacharit complet)
-   */
-  static getServiceStructure(serviceType: ServiceType): string[] {
-    // Structure standard d'un service
-    const structures: Record<ServiceType, string[]> = {
-      shacharit: [
-        'blessings-morning',
-        'psalms',
-        'yigdal',
-        'shema-brachot',
-        'shema',
-        'amidah',
-        'takhanun',
-      ],
-      mincha: ['ashrei', 'amidah', 'tachanun', 'aleynu'],
-      arvit: ['maariv', 'shema', 'amidah'],
-      "ma'ariv": ['maariv', 'shema', 'amidah'],
-    };
-
-    return structures[serviceType];
+  static async getPrayerContent(
+    id: string,
+    lang: 'he' | 'en'
+  ): Promise<string> {
+    const prayer = await this.getPrayerById(id);
+    if (!prayer) return '';
+    return lang === 'he' ? prayer.contentHe : prayer.content;
   }
 }
 

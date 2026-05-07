@@ -1,184 +1,24 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, useColorScheme } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useAppSelector } from '@hooks/useRedux';
+import { useAppSelector, useAppDispatch } from '@hooks/useRedux';
 import { useI18n } from '@hooks/useI18n';
-
-const styles = StyleSheet.create({
-  screen: {
-    flex: 1,
-    backgroundColor: '#0C1322',
-  },
-  content: {
-    paddingHorizontal: 20,
-    paddingBottom: 120,
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingBottom: 14,
-  },
-  brand: {
-    color: '#F1D77A',
-    fontSize: 26,
-    letterSpacing: 1.6,
-    fontWeight: '800',
-    fontFamily: 'serif',
-  },
-  title: {
-    color: '#DCE2F7',
-    fontSize: 42,
-    fontFamily: 'serif',
-    fontWeight: '700',
-    marginTop: 10,
-  },
-  subtitle: {
-    color: '#A7B0C4',
-    fontSize: 18,
-    lineHeight: 26,
-    marginTop: 8,
-    marginBottom: 24,
-  },
-  card: {
-    backgroundColor: 'rgba(255,255,255,0.04)',
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
-    borderRadius: 28,
-    padding: 18,
-    marginBottom: 16,
-  },
-  cardHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  cardLabel: {
-    color: '#F1D77A',
-    fontSize: 12,
-    letterSpacing: 1.8,
-    fontWeight: '800',
-  },
-  cardTitle: {
-    color: '#DCE2F7',
-    fontSize: 26,
-    fontFamily: 'serif',
-    marginBottom: 4,
-  },
-  cardText: {
-    color: '#A7B0C4',
-    fontSize: 15,
-  },
-  button: {
-    marginTop: 16,
-    borderRadius: 18,
-    backgroundColor: '#E9C349',
-    paddingVertical: 14,
-    alignItems: 'center',
-  },
-  buttonText: {
-    color: '#0C1322',
-    fontWeight: '800',
-    letterSpacing: 0.8,
-  },
-  toggleRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingVertical: 16,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255,255,255,0.06)',
-  },
-  toggleLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 14,
-  },
-  toggleIcon: {
-    width: 42,
-    height: 42,
-    borderRadius: 21,
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    alignItems: 'center',
-    justifyContent: 'center',
-    color: '#F1D77A',
-    fontSize: 18,
-  },
-  toggleTitle: {
-    color: '#DCE2F7',
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  toggleSub: {
-    color: '#7F879A',
-    marginTop: 3,
-  },
-  pill: {
-    backgroundColor: 'rgba(233, 195, 73, 0.12)',
-    borderColor: 'rgba(233, 195, 73, 0.28)',
-    borderWidth: 1,
-    borderRadius: 999,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-  },
-  pillText: {
-    color: '#F1D77A',
-    fontSize: 12,
-    fontWeight: '700',
-    letterSpacing: 1.2,
-  },
-  segmented: {
-    flexDirection: 'row',
-    backgroundColor: 'rgba(255,255,255,0.05)',
-    borderRadius: 999,
-    padding: 4,
-  },
-  segmentedItem: {
-    flex: 1,
-    borderRadius: 999,
-    paddingVertical: 10,
-    alignItems: 'center',
-  },
-  segmentedItemActive: {
-    backgroundColor: '#303746',
-  },
-  segmentedText: {
-    color: '#A7B0C4',
-    fontWeight: '700',
-  },
-  segmentedTextActive: {
-    color: '#E8EAEE',
-  },
-  banner: {
-    marginTop: 14,
-    height: 180,
-    borderRadius: 28,
-    overflow: 'hidden',
-    backgroundColor: '#1A2233',
-    justifyContent: 'flex-end',
-    padding: 18,
-  },
-  bannerOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(12, 19, 34, 0.15)',
-  },
-  bannerText: {
-    color: '#FFFFFF',
-    fontSize: 20,
-    fontWeight: '700',
-  },
-  bannerSub: {
-    color: '#DCE2F7',
-    marginTop: 6,
-  },
-});
+import { useTheme } from '@hooks/useTheme';
+import { setDarkMode } from '@store/slices/userSlice';
 
 const SettingsScreen = () => {
   const insets = useSafeAreaInsets();
-  useColorScheme();
+  const theme = useTheme();
+  const dispatch = useAppDispatch();
   const { t } = useI18n();
   const preferences = useAppSelector((state) => state.user.preferences);
+  const isDarkMode = preferences.isDarkMode;
+
+  const styles = createStyles(theme);
+
+  const toggleTheme = (dark: boolean) => {
+    dispatch(setDarkMode(dark));
+  };
 
   return (
     <View style={styles.screen}>
@@ -188,7 +28,7 @@ const SettingsScreen = () => {
       >
         <View style={styles.header}>
           <Text style={styles.brand}>SIDDUR</Text>
-          <Text style={{ color: '#E9C349', fontSize: 22 }}>☰</Text>
+          <Text style={{ color: theme.colors.secondary, fontSize: 22 }}>☰</Text>
         </View>
 
         <Text style={styles.title}>Paramètres</Text>
@@ -213,16 +53,26 @@ const SettingsScreen = () => {
             <Text style={styles.cardLabel}>Selected</Text>
             <Text style={styles.pillText}>Appearance</Text>
           </View>
-          <Text style={styles.cardTitle}>Liquid Glass Dark</Text>
-          <Text style={styles.cardText}>Un thème sombre à contraste élevé adapté à la lecture nocturne</Text>
+          <Text style={styles.cardTitle}>{isDarkMode ? 'Liquid Glass Dark' : 'Crystal Light'}</Text>
+          <Text style={styles.cardText}>
+            {isDarkMode 
+              ? 'Un thème sombre à contraste élevé adapté à la lecture nocturne'
+              : 'Un thème clair et épuré pour une lecture diurne optimale'}
+          </Text>
           <View style={{ marginTop: 16 }}>
             <View style={styles.segmented}>
-              <View style={[styles.segmentedItem, styles.segmentedItemActive]}>
-                <Text style={styles.segmentedTextActive}>Sombre</Text>
-              </View>
-              <View style={styles.segmentedItem}>
-                <Text style={styles.segmentedText}>Clair</Text>
-              </View>
+              <TouchableOpacity 
+                style={[styles.segmentedItem, isDarkMode && styles.segmentedItemActive]}
+                onPress={() => toggleTheme(true)}
+              >
+                <Text style={[styles.segmentedText, isDarkMode && styles.segmentedTextActive]}>Sombre</Text>
+              </TouchableOpacity>
+              <TouchableOpacity 
+                style={[styles.segmentedItem, !isDarkMode && styles.segmentedItemActive]}
+                onPress={() => toggleTheme(false)}
+              >
+                <Text style={[styles.segmentedText, !isDarkMode && styles.segmentedTextActive]}>Clair</Text>
+              </TouchableOpacity>
             </View>
           </View>
         </View>
@@ -249,16 +99,6 @@ const SettingsScreen = () => {
             </View>
             <View style={styles.pill}><Text style={styles.pillText}>ACTIVÉ</Text></View>
           </View>
-          <View style={styles.toggleRow}>
-            <View style={styles.toggleLeft}>
-              <Text style={styles.toggleIcon}>☾</Text>
-              <View>
-                <Text style={styles.toggleTitle}>Arvit</Text>
-                <Text style={styles.toggleSub}>Prière du soir</Text>
-              </View>
-            </View>
-            <View style={styles.pill}><Text style={styles.pillText}>ACTIVÉ</Text></View>
-          </View>
         </View>
 
         <View style={styles.card}>
@@ -266,7 +106,7 @@ const SettingsScreen = () => {
           <Text style={styles.cardText}>Choisissez votre méthode de calcul préférée pour les zmanim.</Text>
           <View style={{ marginTop: 16, gap: 12 }}>
             <View style={styles.pill}><Text style={styles.pillText}>Magen Avraham · 72 minutes</Text></View>
-            <View style={[styles.pill, { backgroundColor: 'rgba(255,255,255,0.04)' }]}><Text style={{ color: '#A7B0C4', fontWeight: '700' }}>Gra / Baal HaTanya · Heures égales</Text></View>
+            <View style={[styles.pill, { backgroundColor: theme.colors.card, borderColor: theme.colors.border }]}><Text style={{ color: theme.colors.textSecondary, fontWeight: '700' }}>Gra / Baal HaTanya · Heures égales</Text></View>
           </View>
         </View>
 
@@ -279,5 +119,182 @@ const SettingsScreen = () => {
     </View>
   );
 };
+
+const createStyles = (theme: any) => StyleSheet.create({
+  screen: {
+    flex: 1,
+    backgroundColor: theme.colors.background,
+  },
+  content: {
+    paddingHorizontal: 20,
+    paddingBottom: 120,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingBottom: 14,
+  },
+  brand: {
+    color: theme.colors.primary,
+    fontSize: 26,
+    letterSpacing: 1.6,
+    fontWeight: '800',
+    fontFamily: 'serif',
+  },
+  title: {
+    color: theme.colors.text,
+    fontSize: 42,
+    fontFamily: 'serif',
+    fontWeight: '700',
+    marginTop: 10,
+  },
+  subtitle: {
+    color: theme.colors.textSecondary,
+    fontSize: 18,
+    lineHeight: 26,
+    marginTop: 8,
+    marginBottom: 24,
+  },
+  card: {
+    backgroundColor: theme.colors.card,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    borderRadius: 28,
+    padding: 18,
+    marginBottom: 16,
+    ...theme.shadows.sm,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  cardLabel: {
+    color: theme.colors.primary,
+    fontSize: 12,
+    letterSpacing: 1.8,
+    fontWeight: '800',
+  },
+  cardTitle: {
+    color: theme.colors.text,
+    fontSize: 26,
+    fontFamily: 'serif',
+    marginBottom: 4,
+  },
+  cardText: {
+    color: theme.colors.textSecondary,
+    fontSize: 15,
+  },
+  button: {
+    marginTop: 16,
+    borderRadius: 18,
+    backgroundColor: theme.colors.primary,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  buttonText: {
+    color: theme.colors.background,
+    fontWeight: '800',
+    letterSpacing: 0.8,
+  },
+  toggleRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingVertical: 16,
+    borderTopWidth: 1,
+    borderTopColor: theme.colors.border,
+  },
+  toggleLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 14,
+  },
+  toggleIcon: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: theme.colors.highlight,
+    alignItems: 'center',
+    justifyContent: 'center',
+    color: theme.colors.primary,
+    fontSize: 18,
+    textAlign: 'center',
+    lineHeight: 42,
+  },
+  toggleTitle: {
+    color: theme.colors.text,
+    fontSize: 16,
+    fontWeight: '700',
+  },
+  toggleSub: {
+    color: theme.colors.textSecondary,
+    marginTop: 3,
+    fontSize: 13,
+  },
+  pill: {
+    backgroundColor: theme.colors.highlight,
+    borderColor: theme.colors.border,
+    borderWidth: 1,
+    borderRadius: 999,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+  },
+  pillText: {
+    color: theme.colors.primary,
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+  },
+  segmented: {
+    flexDirection: 'row',
+    backgroundColor: theme.colors.highlight,
+    borderRadius: 999,
+    padding: 4,
+  },
+  segmentedItem: {
+    flex: 1,
+    borderRadius: 999,
+    paddingVertical: 10,
+    alignItems: 'center',
+  },
+  segmentedItemActive: {
+    backgroundColor: theme.colors.surface,
+    ...theme.shadows.sm,
+  },
+  segmentedText: {
+    color: theme.colors.textSecondary,
+    fontWeight: '700',
+  },
+  segmentedTextActive: {
+    color: theme.colors.primary,
+  },
+  banner: {
+    marginTop: 14,
+    height: 180,
+    borderRadius: 28,
+    overflow: 'hidden',
+    backgroundColor: theme.colors.surface,
+    justifyContent: 'flex-end',
+    padding: 18,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+  },
+  bannerOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(0, 0, 0, 0.05)',
+  },
+  bannerText: {
+    color: theme.colors.text,
+    fontSize: 20,
+    fontWeight: '700',
+  },
+  bannerSub: {
+    color: theme.colors.textSecondary,
+    marginTop: 6,
+  },
+});
 
 export default SettingsScreen;

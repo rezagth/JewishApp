@@ -1,9 +1,3 @@
-/**
- * SiddurScreen - Écran Siddur / תפילות (Prières)
- * Affiche les prières de l'heure d'abord, puis les autres catégories
- * Design cohérent avec le reste de l'app
- */
-
 import React, { useState } from 'react';
 import {
   View,
@@ -17,6 +11,8 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { PRAYER_CATEGORIES, PRAYER_TIME_CATEGORIES, PrayerCategory } from '@services/sefaria.service';
 import { usePrayerTime } from '@hooks/usePrayerTime';
 import PrayerReaderScreen from '@screens/PrayerReaderScreen';
+import { useTheme } from '@hooks/useTheme';
+import { AppTheme } from '@constants/theme';
 import dayjs from 'dayjs';
 
 // ─── Composant ligne de prière ────────────────────────────────────────────────
@@ -24,26 +20,28 @@ interface PrayerRowProps {
   category: PrayerCategory;
   onPress: () => void;
   isCurrent?: boolean;
+  theme: AppTheme;
 }
 
-const PrayerRow: React.FC<PrayerRowProps> = ({ category, onPress, isCurrent = false }) => (
-  <TouchableOpacity 
-    style={[styles.row, isCurrent && styles.rowCurrent]} 
-    onPress={onPress} 
-    activeOpacity={0.6}
-  >
-    {/* Flèche gauche (chevron RTL) */}
-    <Text style={[styles.chevron, isCurrent && styles.chevronCurrent]}>‹</Text>
-
-    {/* Texte aligné à droite */}
-    <View style={styles.rowTextWrap}>
-      <Text style={[styles.rowHe, isCurrent && styles.rowHeCurrent]}>
-        {category.emoji ? `${category.titleHe} ${category.emoji}` : category.titleHe}
-      </Text>
-      <Text style={[styles.rowFr, isCurrent && styles.rowFrCurrent]}>{category.titleFr}</Text>
-    </View>
-  </TouchableOpacity>
-);
+const PrayerRow: React.FC<PrayerRowProps> = ({ category, onPress, isCurrent = false, theme }) => {
+  const styles = createStyles(theme);
+  
+  return (
+    <TouchableOpacity 
+      style={[styles.row, isCurrent && styles.rowCurrent]} 
+      onPress={onPress} 
+      activeOpacity={0.6}
+    >
+      <Text style={[styles.chevron, isCurrent && styles.chevronCurrent]}>‹</Text>
+      <View style={styles.rowTextWrap}>
+        <Text style={[styles.rowHe, isCurrent && styles.rowHeCurrent]}>
+          {category.emoji ? `${category.titleHe} ${category.emoji}` : category.titleHe}
+        </Text>
+        <Text style={[styles.rowFr, isCurrent && styles.rowFrCurrent]}>{category.titleFr}</Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
 
 const formatTimeRemaining = (endTime: Date): string => {
   const now = dayjs();
@@ -65,6 +63,7 @@ interface CurrentPrayerIndicatorProps {
   nameHe: string;
   progress: number;
   endTime: Date;
+  theme: AppTheme;
 }
 
 const CurrentPrayerIndicator: React.FC<CurrentPrayerIndicatorProps> = ({
@@ -72,7 +71,9 @@ const CurrentPrayerIndicator: React.FC<CurrentPrayerIndicatorProps> = ({
   nameHe,
   progress,
   endTime,
+  theme,
 }) => {
+  const styles = createStyles(theme);
   const timeRemaining = formatTimeRemaining(endTime);
   
   return (
@@ -87,7 +88,7 @@ const CurrentPrayerIndicator: React.FC<CurrentPrayerIndicatorProps> = ({
       </View>
       <Text style={styles.currentPrayerTime}>Fin dans {timeRemaining}</Text>
       <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: `${progress}%` }]} />
+        <View style={[styles.progressFill, { width: `${progress}%`, backgroundColor: theme.colors.secondary }]} />
       </View>
     </View>
   );
@@ -96,10 +97,12 @@ const CurrentPrayerIndicator: React.FC<CurrentPrayerIndicatorProps> = ({
 // ─── Composant principal ──────────────────────────────────────────────────────
 const SiddurScreen = () => {
   const insets = useSafeAreaInsets();
+  const theme = useTheme();
   const [selectedCategory, setSelectedCategory] = useState<PrayerCategory | null>(null);
   const { current: currentPrayer } = usePrayerTime();
 
-  // Si une catégorie est sélectionnée → afficher le lecteur
+  const styles = createStyles(theme);
+
   if (selectedCategory) {
     return (
       <PrayerReaderScreen
@@ -111,7 +114,7 @@ const SiddurScreen = () => {
 
   return (
     <View style={styles.screen}>
-      <StatusBar barStyle="light-content" backgroundColor="#0C1322" />
+      <StatusBar barStyle={theme.colors.background === '#0C1322' ? 'light-content' : 'dark-content'} />
       <View style={styles.backdropTop} />
       <View style={styles.backdropBottom} />
 
@@ -136,11 +139,13 @@ const SiddurScreen = () => {
             nameHe={currentPrayer.nameHe}
             progress={currentPrayer.progress}
             endTime={currentPrayer.endTime}
+            theme={theme}
           />
         )}
 
+        {/* Services Quotidiens */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Prières de l'heure</Text>
+          <Text style={styles.sectionTitle}>Services Quotidiens</Text>
           <View style={styles.sectionList}>
             {PRAYER_TIME_CATEGORIES.map((cat) => {
               const isCurrent = currentPrayer?.nameHe === cat.titleHe;
@@ -150,20 +155,38 @@ const SiddurScreen = () => {
                   category={cat}
                   onPress={() => setSelectedCategory(cat)}
                   isCurrent={isCurrent}
+                  theme={theme}
                 />
               );
             })}
           </View>
         </View>
 
+        {/* Chabbat & Fêtes */}
         <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Autres prières</Text>
+          <Text style={styles.sectionTitle}>Chabbat & Fêtes</Text>
           <View style={styles.sectionList}>
-            {PRAYER_CATEGORIES.map((cat) => (
+            {PRAYER_CATEGORIES.filter(c => c.id.includes('shabbat') || c.id === 'havdala').map((cat) => (
               <PrayerRow
                 key={cat.id}
                 category={cat}
                 onPress={() => setSelectedCategory(cat)}
+                theme={theme}
+              />
+            ))}
+          </View>
+        </View>
+
+        {/* Bénédictions & Lectures */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Bénédictions & Lectures</Text>
+          <View style={styles.sectionList}>
+            {PRAYER_CATEGORIES.filter(c => !c.id.includes('shabbat') && c.id !== 'havdala').map((cat) => (
+              <PrayerRow
+                key={cat.id}
+                category={cat}
+                onPress={() => setSelectedCategory(cat)}
+                theme={theme}
               />
             ))}
           </View>
@@ -174,10 +197,10 @@ const SiddurScreen = () => {
 };
 
 // ─── Styles ───────────────────────────────────────────────────────────────────
-const styles = StyleSheet.create({
+const createStyles = (theme: AppTheme) => StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#0C1322',
+    backgroundColor: theme.colors.background,
   },
   backdropTop: {
     position: 'absolute',
@@ -186,7 +209,7 @@ const styles = StyleSheet.create({
     width: 260,
     height: 260,
     borderRadius: 130,
-    backgroundColor: 'rgba(233, 195, 73, 0.06)',
+    backgroundColor: theme.colors.highlight,
   },
   backdropBottom: {
     position: 'absolute',
@@ -195,7 +218,8 @@ const styles = StyleSheet.create({
     width: 240,
     height: 240,
     borderRadius: 120,
-    backgroundColor: 'rgba(30, 58, 95, 0.22)',
+    backgroundColor: theme.colors.card,
+    opacity: 0.3,
   },
   content: {
     paddingHorizontal: 20,
@@ -207,18 +231,18 @@ const styles = StyleSheet.create({
     paddingBottom: 14,
   },
   brand: {
-    color: '#F1D77A',
+    color: theme.colors.primary,
     fontSize: 26,
     letterSpacing: 1.6,
     fontWeight: '800',
     fontFamily: 'serif',
   },
   headerIcon: {
-    color: '#E9C349',
+    color: theme.colors.secondary,
     fontSize: 22,
   },
   titleHe: {
-    color: '#DCE2F7',
+    color: theme.colors.text,
     fontSize: 42,
     fontFamily: 'serif',
     fontWeight: '700',
@@ -226,22 +250,21 @@ const styles = StyleSheet.create({
     writingDirection: 'rtl',
   },
   titleFr: {
-    color: '#A7B0C4',
+    color: theme.colors.textSecondary,
     fontSize: 12,
     letterSpacing: 2,
     textTransform: 'uppercase',
     marginTop: 6,
     textAlign: 'right',
   },
-
-  // Boîte prière en cours
   currentPrayerBox: {
     marginTop: 20,
     padding: 18,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: theme.colors.card,
     borderRadius: 28,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: theme.colors.border,
+    ...theme.shadows.sm,
   },
   currentPrayerHeader: {
     flexDirection: 'row',
@@ -250,7 +273,7 @@ const styles = StyleSheet.create({
   },
   currentPrayerLabel: {
     fontSize: 11,
-    color: '#F1D77A',
+    color: theme.colors.primary,
     fontWeight: '800',
     letterSpacing: 1.4,
     textTransform: 'uppercase',
@@ -258,14 +281,14 @@ const styles = StyleSheet.create({
   currentPrayerTitle: {
     fontSize: 28,
     fontFamily: 'serif',
-    color: '#DCE2F7',
+    color: theme.colors.text,
     fontWeight: '700',
     marginTop: 6,
     writingDirection: 'rtl',
     textAlign: 'right',
   },
   currentPrayerSubtitle: {
-    color: '#A7B0C4',
+    color: theme.colors.textSecondary,
     marginTop: 4,
   },
   currentPrayerEmoji: {
@@ -273,27 +296,24 @@ const styles = StyleSheet.create({
   },
   currentPrayerTime: {
     fontSize: 12,
-    color: '#A7B0C4',
+    color: theme.colors.textSecondary,
     marginTop: 10,
   },
   progressTrack: {
     marginTop: 10,
     height: 4,
     borderRadius: 999,
-    backgroundColor: 'rgba(255,255,255,0.10)',
+    backgroundColor: theme.colors.border,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
-    backgroundColor: '#E9C349',
   },
-
-  // Titre de section
   section: {
     marginTop: 22,
   },
   sectionTitle: {
-    color: '#A7B0C4',
+    color: theme.colors.textSecondary,
     fontSize: 12,
     letterSpacing: 2,
     textTransform: 'uppercase',
@@ -302,29 +322,27 @@ const styles = StyleSheet.create({
   sectionList: {
     gap: 12,
   },
-
-  // Ligne de prière
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 16,
     paddingHorizontal: 18,
-    backgroundColor: 'rgba(255,255,255,0.04)',
+    backgroundColor: theme.colors.card,
     borderRadius: 22,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.08)',
+    borderColor: theme.colors.border,
   },
   rowCurrent: {
-    borderColor: '#E9C349',
-    backgroundColor: 'rgba(233, 195, 73, 0.10)',
+    borderColor: theme.colors.secondary,
+    backgroundColor: theme.colors.highlight,
   },
   chevron: {
     fontSize: 24,
-    color: '#F1D77A',
+    color: theme.colors.primary,
   },
   chevronCurrent: {
-    color: '#E9C349',
+    color: theme.colors.secondary,
   },
   rowTextWrap: {
     flex: 1,
@@ -333,22 +351,23 @@ const styles = StyleSheet.create({
   rowHe: {
     fontSize: 22,
     fontFamily: 'serif',
-    color: '#DCE2F7',
+    color: theme.colors.text,
     textAlign: 'right',
     writingDirection: 'rtl',
   },
   rowHeCurrent: {
-    color: '#FFFFFF',
+    color: theme.colors.text,
+    fontWeight: 'bold',
   },
   rowFr: {
     fontSize: 12,
-    color: '#A7B0C4',
+    color: theme.colors.textSecondary,
     textAlign: 'right',
     marginTop: 3,
     letterSpacing: 0.4,
   },
   rowFrCurrent: {
-    color: '#DCE2F7',
+    color: theme.colors.text,
   },
 });
 
