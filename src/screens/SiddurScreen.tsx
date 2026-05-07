@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import React, { useState, useMemo } from 'react';
+=======
+import React, { useState } from 'react';
+>>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
 import {
   View,
   StyleSheet,
@@ -19,7 +23,10 @@ import { usePrayerTime } from '@hooks/usePrayerTime';
 import PrayerReaderScreen from '@screens/PrayerReaderScreen';
 import { useTheme } from '@hooks/useTheme';
 import { AppTheme } from '@constants/theme';
+<<<<<<< HEAD
 import { RootState } from '@store/index';
+=======
+>>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
 import dayjs from 'dayjs';
 
 // ─── Composant ligne de prière ────────────────────────────────────────────────
@@ -28,10 +35,16 @@ interface PrayerRowProps {
   onPress: () => void;
   isCurrent?: boolean;
   theme: AppTheme;
+<<<<<<< HEAD
   showChevron?: boolean;
 }
 
 const PrayerRow: React.FC<PrayerRowProps> = ({ category, onPress, isCurrent = false, theme, showChevron = true }) => {
+=======
+}
+
+const PrayerRow: React.FC<PrayerRowProps> = ({ category, onPress, isCurrent = false, theme }) => {
+>>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
   const styles = createStyles(theme);
   
   return (
@@ -40,10 +53,17 @@ const PrayerRow: React.FC<PrayerRowProps> = ({ category, onPress, isCurrent = fa
       onPress={onPress} 
       activeOpacity={0.6}
     >
+<<<<<<< HEAD
       {showChevron && <Text style={[styles.chevron, isCurrent && styles.chevronCurrent]}>‹</Text>}
       <View style={styles.rowTextWrap}>
         <Text style={[styles.rowHe, isCurrent && styles.rowHeCurrent]}>
           {category.titleHe}
+=======
+      <Text style={[styles.chevron, isCurrent && styles.chevronCurrent]}>‹</Text>
+      <View style={styles.rowTextWrap}>
+        <Text style={[styles.rowHe, isCurrent && styles.rowHeCurrent]}>
+          {category.emoji ? `${category.titleHe} ${category.emoji}` : category.titleHe}
+>>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
         </Text>
         <Text style={[styles.rowFr, isCurrent && styles.rowFrCurrent]}>{category.titleFr}</Text>
       </View>
@@ -108,6 +128,7 @@ type SiddurRouteProp = RouteProp<{ Siddur: { category?: PrayerCategory } }, 'Sid
 const SiddurScreen = () => {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
+<<<<<<< HEAD
   const route = useRoute<SiddurRouteProp>();
   const nusach = useSelector((state: RootState) => state.user.preferences.nusach);
   
@@ -143,6 +164,13 @@ const SiddurScreen = () => {
     }
   };
 
+=======
+  const [selectedCategory, setSelectedCategory] = useState<PrayerCategory | null>(null);
+  const { current: currentPrayer } = usePrayerTime();
+
+  const styles = createStyles(theme);
+
+>>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
   if (selectedCategory) {
     return (
       <PrayerReaderScreen
@@ -180,6 +208,7 @@ const SiddurScreen = () => {
             <Text style={styles.titleHe}>תפילות</Text>
             <Text style={styles.titleFr}>PRIERES</Text>
 
+<<<<<<< HEAD
             <View style={styles.nusachBadge}>
               <Text style={styles.nusachBadgeText}>
                 Rite: {nusach === 'ashkenazi' ? 'Ashkénaze' : 'Séfarade'}
@@ -192,6 +221,61 @@ const SiddurScreen = () => {
                 nameHe={currentPrayer.nameHe}
                 progress={currentPrayer.progress}
                 endTime={currentPrayer.endTime}
+=======
+        {currentPrayer && (
+          <CurrentPrayerIndicator
+            name={currentPrayer.name}
+            nameHe={currentPrayer.nameHe}
+            progress={currentPrayer.progress}
+            endTime={currentPrayer.endTime}
+            theme={theme}
+          />
+        )}
+
+        {/* Services Quotidiens */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Services Quotidiens</Text>
+          <View style={styles.sectionList}>
+            {PRAYER_TIME_CATEGORIES.map((cat) => {
+              const isCurrent = currentPrayer?.nameHe === cat.titleHe;
+              return (
+                <PrayerRow
+                  key={cat.id}
+                  category={cat}
+                  onPress={() => setSelectedCategory(cat)}
+                  isCurrent={isCurrent}
+                  theme={theme}
+                />
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Chabbat & Fêtes */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Chabbat & Fêtes</Text>
+          <View style={styles.sectionList}>
+            {PRAYER_CATEGORIES.filter(c => c.id.includes('shabbat') || c.id === 'havdala').map((cat) => (
+              <PrayerRow
+                key={cat.id}
+                category={cat}
+                onPress={() => setSelectedCategory(cat)}
+                theme={theme}
+              />
+            ))}
+          </View>
+        </View>
+
+        {/* Bénédictions & Lectures */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Bénédictions & Lectures</Text>
+          <View style={styles.sectionList}>
+            {PRAYER_CATEGORIES.filter(c => !c.id.includes('shabbat') && c.id !== 'havdala').map((cat) => (
+              <PrayerRow
+                key={cat.id}
+                category={cat}
+                onPress={() => setSelectedCategory(cat)}
+>>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
                 theme={theme}
               />
             )}
@@ -251,6 +335,10 @@ const SiddurScreen = () => {
   );
 };
 
+<<<<<<< HEAD
+=======
+// ─── Styles ───────────────────────────────────────────────────────────────────
+>>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
 const createStyles = (theme: AppTheme) => StyleSheet.create({
   screen: {
     flex: 1,
@@ -303,7 +391,11 @@ const createStyles = (theme: AppTheme) => StyleSheet.create({
   },
   brand: {
     color: theme.colors.primary,
+<<<<<<< HEAD
     fontSize: 22,
+=======
+    fontSize: 26,
+>>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
     letterSpacing: 1.6,
     fontWeight: '800',
     fontFamily: 'serif',
