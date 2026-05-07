@@ -41,8 +41,6 @@ const CalendarScreen: React.FC = () => {
         <Text style={styles.title}>{today.locale('fr').format('MMMM YYYY').charAt(0).toUpperCase() + today.locale('fr').format('MMMM YYYY').slice(1)}</Text>
         <Text style={styles.monthText}>{calendarSummary?.hebrewDate || 'Calendrier hébreu en direct'}</Text>
 
-
-
         <View style={styles.calendarShell}>
           <View style={styles.weekRow}>
             {['DIM', 'LUN', 'MAR', 'MER', 'JEU', 'VEN', 'SAM'].map((item) => (
@@ -67,18 +65,12 @@ const CalendarScreen: React.FC = () => {
 
         <Text style={styles.sectionTitle}>Parasha hebdomadaire</Text>
         <View style={styles.card}>
-<<<<<<< HEAD
           <Text style={styles.cardTitle}>{calendarSummary?.parasha || 'Étude de la Torah'}</Text>
           <Text style={styles.cardText}>
             Cette section nous enseigne les fondements de la foi et de la pratique juive.
             C'est un guide précieux pour élever notre quotidien par la sagesse ancestrale.
           </Text>
           <View style={{ height: 3, borderRadius: 999, backgroundColor: theme.colors.border, marginTop: 8 }}>
-=======
-          <Text style={styles.cardTitle}>{calendarSummary?.parasha || 'Flux du calendrier en direct'}</Text>
-          <Text style={styles.cardText}>Progression d'étude et guidance hebdomadaire pour le cycle actuel.</Text>
-          <View style={{ height: 3, borderRadius: 999, backgroundColor: theme.colors.border }}>
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
             <View style={{ width: '72%', height: '100%', borderRadius: 999, backgroundColor: theme.colors.secondary }} />
           </View>
         </View>
@@ -177,7 +169,6 @@ const createStyles = (theme: AppTheme) => StyleSheet.create({
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-<<<<<<< HEAD
     justifyContent: 'space-between',
     rowGap: 8,
   },
@@ -185,15 +176,6 @@ const createStyles = (theme: AppTheme) => StyleSheet.create({
     width: 38,
     height: 38,
     borderRadius: 12,
-=======
-    gap: 10,
-  },
-  dayCard: {
-    width: '18%',
-    minWidth: 54,
-    aspectRatio: 0.78,
-    borderRadius: 18,
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
     backgroundColor: theme.colors.highlight,
     borderWidth: 1,
     borderColor: theme.colors.border,
@@ -207,7 +189,6 @@ const createStyles = (theme: AppTheme) => StyleSheet.create({
   },
   dayNum: {
     color: theme.colors.text,
-<<<<<<< HEAD
     fontSize: 14,
     fontWeight: '700',
     includeFontPadding: false,
@@ -220,16 +201,6 @@ const createStyles = (theme: AppTheme) => StyleSheet.create({
     backgroundColor: theme.colors.secondary,
     position: 'absolute',
     bottom: 4,
-=======
-    fontSize: 16,
-    fontWeight: '700',
-  },
-  daySub: {
-    color: theme.colors.textSecondary,
-    fontSize: 9,
-    marginTop: 4,
-    textAlign: 'center',
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
   },
   sectionTitle: {
     color: theme.colors.textSecondary,
@@ -261,11 +232,7 @@ const createStyles = (theme: AppTheme) => StyleSheet.create({
     lineHeight: 22,
   },
   heroImage: {
-<<<<<<< HEAD
     height: 140,
-=======
-    height: 170,
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
     borderRadius: 22,
     backgroundColor: theme.colors.highlight,
     marginBottom: 14,
@@ -339,7 +306,19 @@ const createStyles = (theme: AppTheme) => StyleSheet.create({
     color: theme.colors.textSecondary,
     marginTop: 4,
   },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  pillText: {
+    color: theme.colors.primary,
+    fontSize: 10,
+    fontWeight: '800',
+    letterSpacing: 1.1,
+    textTransform: 'uppercase',
+  },
 });
 
 export default CalendarScreen;
-

@@ -13,17 +13,11 @@ import {
   StatusBar,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-<<<<<<< HEAD
 import { PrayerCategory } from '@services/prayerCategories.service';
 import { useTheme } from '@hooks/useTheme';
 import { AppTheme } from '@constants/theme';
 import SiddurService from '@services/siddur.service';
 import { Prayer } from '../types';
-=======
-import { PrayerCategory, getCachedSefariaText, SefariaText } from '@services/sefaria.service';
-import { useTheme } from '@hooks/useTheme';
-import { AppTheme } from '@constants/theme';
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
 
 interface Props {
   category: PrayerCategory;
@@ -39,59 +33,24 @@ const PrayerReaderScreen: React.FC<Props> = ({ category, onBack }) => {
 
   const styles = createStyles(theme);
 
-  const styles = createStyles(theme);
-
   const loadText = useCallback(async () => {
     setLoading(true);
     try {
-<<<<<<< HEAD
       // On utilise la clé JSON définie dans la catégorie ou l'ID par défaut
       const serviceKey = category.jsonKey || category.id;
       const data = await SiddurService.getCompleteSiddur(serviceKey as any, 'sephardic');
       setPrayers(data);
-=======
-      // Si plusieurs refs séparées par virgule, on les fusionne (ex: Tikoun Haklali)
-      const refs = category.sefariaRef.split(',');
-      if (refs.length > 1) {
-        let combinedHe = '';
-        let combinedEn = '';
-        for (const ref of refs) {
-          const data = await getCachedSefariaText(ref.trim());
-          combinedHe += (combinedHe ? '\n\n' : '') + data.heText;
-          combinedEn += (combinedEn ? '\n\n' : '') + data.enText;
-        }
-        setSefariaData({
-          titleHe: category.titleHe,
-          titleEn: category.titleFr,
-          heText: combinedHe,
-          enText: combinedEn,
-          ref: category.sefariaRef,
-        });
-      } else {
-        const data = await getCachedSefariaText(category.sefariaRef);
-        setSefariaData(data);
-      }
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
     } catch (err) {
       console.warn('Siddur fetch error:', err);
     } finally {
       setLoading(false);
     }
-<<<<<<< HEAD
   }, [category]);
-=======
-  }, [category.sefariaRef, category.titleHe, category.titleFr]);
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
 
   useEffect(() => {
     loadText();
   }, [loadText]);
 
-<<<<<<< HEAD
-=======
-  const hebrewText = sefariaData?.heText || category.staticHe || '';
-
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
   return (
     <View style={styles.screen}>
       <StatusBar barStyle={theme.colors.background === '#0C1322' ? 'light-content' : 'dark-content'} />
@@ -131,11 +90,7 @@ const PrayerReaderScreen: React.FC<Props> = ({ category, onBack }) => {
       {loading ? (
         <View style={styles.loadingContainer}>
           <ActivityIndicator size="large" color={theme.colors.primary} />
-<<<<<<< HEAD
           <Text style={styles.loadingText}>Chargement des prières...</Text>
-=======
-          <Text style={styles.loadingText}>Chargement depuis Sefaria...</Text>
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
         </View>
       ) : (
         <ScrollView
@@ -157,21 +112,8 @@ const PrayerReaderScreen: React.FC<Props> = ({ category, onBack }) => {
               </View>
             ))
           ) : (
-<<<<<<< HEAD
             <View style={styles.emptyContainer}>
               <Text style={styles.emptyText}>Aucun texte trouvé pour cette catégorie.</Text>
-=======
-            <Text style={styles.emptyText}>Texte non disponible</Text>
-          )}
-
-          {/* Traduction si disponible */}
-          {sefariaData?.enText ? (
-            <View style={styles.translationCard}>
-              <Text style={styles.translationLabel}>Traduction (En)</Text>
-              <Text style={styles.translationText} selectable>
-                {sefariaData.enText}
-              </Text>
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
             </View>
           )}
         </ScrollView>
@@ -286,40 +228,17 @@ const createStyles = (theme: AppTheme) => StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 16,
   },
-<<<<<<< HEAD
-=======
-  sourceBadge: {
-    alignSelf: 'center',
-    backgroundColor: theme.colors.highlight,
-    borderRadius: 999,
-    paddingHorizontal: 14,
-    paddingVertical: 6,
-    marginBottom: 16,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  sourceBadgeText: {
-    fontSize: 12,
-    color: theme.colors.text,
-    letterSpacing: 0.5,
-  },
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
   textCard: {
     backgroundColor: theme.colors.card,
     borderWidth: 1,
     borderColor: theme.colors.border,
     borderRadius: 24,
-<<<<<<< HEAD
     padding: 20,
-=======
-    padding: 18,
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
     ...theme.shadows.sm,
   },
   prayerSectionTitle: {
     fontSize: 18,
     fontFamily: 'serif',
-<<<<<<< HEAD
     color: theme.colors.primary,
     textAlign: 'center',
     marginBottom: 10,
@@ -348,41 +267,7 @@ const createStyles = (theme: AppTheme) => StyleSheet.create({
     color: theme.colors.textSecondary,
     fontSize: 16,
     textAlign: 'center',
-=======
-    color: theme.colors.text,
-    textAlign: 'right',
-    writingDirection: 'rtl',
-    lineHeight: 52,
-    letterSpacing: 0.5,
-  },
-  emptyText: {
-    textAlign: 'center',
-    color: theme.colors.textSecondary,
-    fontSize: 16,
-    marginTop: 40,
-  },
-  translationCard: {
-    marginTop: 18,
-    backgroundColor: theme.colors.card,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-    borderRadius: 24,
-    padding: 18,
-  },
-  translationLabel: {
-    fontSize: 11,
-    color: theme.colors.primary,
-    letterSpacing: 1.5,
-    textTransform: 'uppercase',
-    marginBottom: 10,
-  },
-  translationText: {
-    fontSize: 15,
-    color: theme.colors.textSecondary,
-    lineHeight: 26,
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
   },
 });
 
 export default PrayerReaderScreen;
-

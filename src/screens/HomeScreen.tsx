@@ -10,26 +10,18 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { usePrayer } from '@hooks/usePrayer';
 import { useZmanim } from '@hooks/useZmanim';
 import { useI18n } from '@hooks/useI18n';
-<<<<<<< HEAD
 import { useAppSelector, useAppDispatch } from '@hooks/useRedux';
 import { useTheme } from '@hooks/useTheme';
 import { useNavigation } from '@react-navigation/native';
 import { getPrayerTimeCategories } from '@services/prayerCategories.service';
 import { setDarkMode } from '@store/slices/userSlice';
 import { Ionicons } from '@expo/vector-icons';
-=======
-import { useAppSelector } from '@hooks/useRedux';
-import { useTheme } from '@hooks/useTheme';
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
 
 const HomeScreen = () => {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
-<<<<<<< HEAD
   const dispatch = useAppDispatch();
   const navigation = useNavigation<any>();
-=======
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
   const { currentService } = usePrayer();
   const { nextZman, zmanim, userLocation, calendarSummary } = useZmanim();
   const { t } = useI18n();
@@ -48,8 +40,6 @@ const HomeScreen = () => {
       navigation.navigate('Siddur');
     }
   };
-
-  const styles = createStyles(theme);
 
   const nextPrayerLabel =
     currentService === 'shacharit'
@@ -194,15 +184,9 @@ const HomeScreen = () => {
           </View>
           <View style={styles.blessingList}>
             {[
-<<<<<<< HEAD
               { id: 1, icon: '🍽', title: 'Birkat HaMazon', sub: 'Action de grâce après repas' },
               { id: 2, icon: '☾', title: 'Kriat Shema Al HaMitah', sub: 'Chema au coucher' },
               { id: 3, icon: '✈', title: 'Tefilat HaDerech', sub: 'Prière du voyageur' },
-=======
-              { id: 1, icon: '🍽', title: 'Birkat HaMazon', sub: 'Grace after meals' },
-              { id: 2, icon: '☾', title: 'Kriat Shema Al HaMitah', sub: 'Bedtime Shema' },
-              { id: 3, icon: '✈', title: 'Tefilat HaDerech', sub: 'Traveler’s Prayer' },
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
             ].map((item) => (
               <View key={item.id} style={styles.blessingCard}>
                 <Text style={styles.blessingIcon}>{item.icon}</Text>
@@ -286,11 +270,8 @@ const createStyles = (theme: any) => StyleSheet.create({
     borderWidth: 1,
     borderColor: theme.colors.border,
     backgroundColor: theme.colors.card,
-<<<<<<< HEAD
     alignItems: 'center',
     justifyContent: 'center',
-=======
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
   },
   hero: {
     backgroundColor: theme.colors.card,

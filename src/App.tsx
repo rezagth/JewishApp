@@ -45,7 +45,6 @@ interface TabIconProps {
 
 const TabIcon: React.FC<TabIconProps> = ({ label, icon, focused, isDarkMode }) => {
   const theme = isDarkMode ? THEME.dark : THEME.light;
-<<<<<<< HEAD
   const iconColor = isDarkMode ? '#FFFFFF' : '#000000';
   
   return (
@@ -58,21 +57,6 @@ const TabIcon: React.FC<TabIconProps> = ({ label, icon, focused, isDarkMode }) =
       <Text style={[
         tabStyles.iconLabel, 
         { color: focused ? iconColor : (isDarkMode ? 'rgba(255,255,255,0.4)' : 'rgba(0,0,0,0.3)') }
-=======
-  
-  return (
-    <View style={[
-      tabStyles.iconWrap, 
-      focused && { backgroundColor: theme.colors.highlight, borderColor: theme.colors.border, borderWidth: 1 }
-    ]}>
-      <Text style={[
-        tabStyles.iconEmoji, 
-        { color: focused ? theme.colors.primary : theme.colors.textSecondary }
-      ]}>{icon}</Text>
-      <Text style={[
-        tabStyles.iconLabel, 
-        { color: focused ? theme.colors.primary : theme.colors.textSecondary }
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
       ]}>{label}</Text>
     </View>
   );
@@ -82,14 +66,7 @@ const tabStyles = StyleSheet.create({
   iconWrap: {
     alignItems: 'center',
     justifyContent: 'center',
-<<<<<<< HEAD
     minWidth: 50,
-=======
-    minWidth: 54,
-    paddingVertical: 4,
-    paddingHorizontal: 10,
-    borderRadius: 18,
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
   },
   iconEmoji: {
     fontSize: 20,
@@ -117,7 +94,6 @@ const HomeTabs = () => {
         tabBarShowLabel: false,
         tabBarStyle: {
           position: 'absolute',
-<<<<<<< HEAD
           left: 20,
           right: 20,
           bottom: 24,
@@ -131,23 +107,6 @@ const HomeTabs = () => {
           shadowColor: '#000',
           shadowOpacity: isDarkMode ? 0.4 : 0.1,
           shadowRadius: 20,
-=======
-          left: 14,
-          right: 14,
-          bottom: 14,
-          height: 76,
-          paddingBottom: 10,
-          paddingTop: 8,
-          backgroundColor: isDarkMode ? 'rgba(12, 19, 34, 0.96)' : 'rgba(255, 255, 255, 0.94)',
-          borderTopWidth: 0,
-          borderWidth: 1,
-          borderColor: theme.colors.border,
-          borderRadius: 26,
-          elevation: 18,
-          shadowColor: '#000',
-          shadowOpacity: isDarkMode ? 0.28 : 0.1,
-          shadowRadius: 18,
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
           shadowOffset: { width: 0, height: 10 },
           overflow: 'hidden',
           paddingBottom: 0, // Désactive le padding par défaut pour centrer manuellement
@@ -175,11 +134,7 @@ const HomeTabs = () => {
         options={{
           tabBarLabel: 'Accueil',
           tabBarIcon: ({ focused }) => (
-<<<<<<< HEAD
             <TabIcon label="Accueil" icon={focused ? "home" : "home-outline"} focused={focused} isDarkMode={isDarkMode} />
-=======
-            <TabIcon label="Accueil" icon="⌂" focused={focused} isDarkMode={isDarkMode} />
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
           ),
         }}
       />
@@ -190,11 +145,7 @@ const HomeTabs = () => {
         options={{
           tabBarLabel: 'Siddur',
           tabBarIcon: ({ focused }) => (
-<<<<<<< HEAD
             <TabIcon label="Siddur" icon={focused ? "book" : "book-outline"} focused={focused} isDarkMode={isDarkMode} />
-=======
-            <TabIcon label="Siddur" icon="✡" focused={focused} isDarkMode={isDarkMode} />
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
           ),
         }}
       />
@@ -205,11 +156,7 @@ const HomeTabs = () => {
         options={{
           tabBarLabel: 'Calendrier',
           tabBarIcon: ({ focused }) => (
-<<<<<<< HEAD
             <TabIcon label="Calendrier" icon={focused ? "calendar" : "calendar-outline"} focused={focused} isDarkMode={isDarkMode} />
-=======
-            <TabIcon label="Calendrier" icon="🗓" focused={focused} isDarkMode={isDarkMode} />
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
           ),
         }}
       />
@@ -220,11 +167,7 @@ const HomeTabs = () => {
         options={{
           tabBarLabel: 'Réglages',
           tabBarIcon: ({ focused }) => (
-<<<<<<< HEAD
             <TabIcon label="Réglages" icon={focused ? "settings" : "settings-outline"} focused={focused} isDarkMode={isDarkMode} />
-=======
-            <TabIcon label="Réglages" icon="⚙" focused={focused} isDarkMode={isDarkMode} />
->>>>>>> 9173f91caf7a76f4ff1a09cc678c194f2a736c57
           ),
         }}
       />
