@@ -171,8 +171,8 @@ const SettingsScreen = () => {
                 <Text style={styles.toggleSub}>Prière du matin</Text>
               </View>
             </View>
-            <View style={[styles.pill, !preferences.notifications.shacharit && { opacity: 0.5, backgroundColor: theme.colors.border }]}>
-              <Text style={[styles.pillText, !preferences.notifications.shacharit && { color: theme.colors.textSecondary }]}>
+            <View style={[styles.pill, !preferences.notifications.shacharit && { opacity: 0.5, backgroundColor: theme.colors.border }]}> 
+              <Text style={[styles.pillText, !preferences.notifications.shacharit && { color: theme.colors.textSecondary }]}> 
                 {preferences.notifications.shacharit ? 'ACTIVÉ' : 'DÉSACTIVÉ'}
               </Text>
             </View>
@@ -190,8 +190,8 @@ const SettingsScreen = () => {
                 <Text style={styles.toggleSub}>Prière de l'après-midi</Text>
               </View>
             </View>
-            <View style={[styles.pill, !preferences.notifications.mincha && { opacity: 0.5, backgroundColor: theme.colors.border }]}>
-              <Text style={[styles.pillText, !preferences.notifications.mincha && { color: theme.colors.textSecondary }]}>
+            <View style={[styles.pill, !preferences.notifications.mincha && { opacity: 0.5, backgroundColor: theme.colors.border }]}> 
+              <Text style={[styles.pillText, !preferences.notifications.mincha && { color: theme.colors.textSecondary }]}> 
                 {preferences.notifications.mincha ? 'ACTIVÉ' : 'DÉSACTIVÉ'}
               </Text>
             </View>
@@ -209,8 +209,8 @@ const SettingsScreen = () => {
                 <Text style={styles.toggleSub}>Prière du soir</Text>
               </View>
             </View>
-            <View style={[styles.pill, !preferences.notifications.arvit && { opacity: 0.5, backgroundColor: theme.colors.border }]}>
-              <Text style={[styles.pillText, !preferences.notifications.arvit && { color: theme.colors.textSecondary }]}>
+            <View style={[styles.pill, !preferences.notifications.arvit && { opacity: 0.5, backgroundColor: theme.colors.border }]}> 
+              <Text style={[styles.pillText, !preferences.notifications.arvit && { color: theme.colors.textSecondary }]}> 
                 {preferences.notifications.arvit ? 'ACTIVÉ' : 'DÉSACTIVÉ'}
               </Text>
             </View>

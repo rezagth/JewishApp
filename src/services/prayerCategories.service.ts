@@ -1,4 +1,4 @@
-import { Nusach } from '../types';
+import { Nusach } from '@types/index';
 
 export interface PrayerCategory {
   id: string;

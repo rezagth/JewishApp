@@ -7,42 +7,17 @@ import { useEffect, useState } from 'react';
 import { useAppDispatch, useAppSelector } from './useRedux';
 import {
   setCurrentService,
-  setPrayers,
   setLoading,
 } from '@store/slices/prayerSlice';
-import SiddurService from '@services/siddur.service';
 import ZmanService from '@services/zmanim.service';
-import { ServiceType, Prayer } from '@types/index';
+import { Prayer, ServiceType } from '../runtime-types';
 
 export const usePrayer = () => {
   const dispatch = useAppDispatch();
   const { currentService, currentPrayers, isLoading } = useAppSelector(
     (state) => state.prayer
   );
-  const { nusach } = useAppSelector((state) => state.user.preferences);
-  const [currentServicePrayers, setCurrentServicePrayers] = useState<Prayer[]>(
-    []
-  );
-
-  /**
-   * Charge les prières au démarrage et quand le service change
-   */
-  useEffect(() => {
-    const loadPrayers = async () => {
-      dispatch(setLoading(true));
-      try {
-        const prayers = await SiddurService.getCompleteSiddur(currentService, nusach);
-        dispatch(setPrayers(prayers));
-        setCurrentServicePrayers(prayers);
-      } catch (error) {
-        console.error('Erreur chargement prières:', error);
-      } finally {
-        dispatch(setLoading(false));
-      }
-    };
-
-    loadPrayers();
-  }, [currentService, nusach]);
+  const [currentServicePrayers, setCurrentServicePrayers] = useState<Prayer[]>([]);
 
   /**
    * Met à jour le service actuel basé sur l'heure
@@ -50,7 +25,18 @@ export const usePrayer = () => {
   useEffect(() => {
     const updateServiceBasedOnTime = () => {
       const now = new Date();
-      const service = ZmanService.getCurrentService(now);
+      // Approximation simple: déterminer le service basé sur l'heure
+      const hour = now.getHours();
+      let service: ServiceType = 'shacharit';
+      
+      if (hour >= 5 && hour < 11) {
+        service = 'shacharit';
+      } else if (hour >= 11 && hour < 16) {
+        service = 'mincha';
+      } else {
+        service = 'arvit';
+      }
+      
       dispatch(setCurrentService(service));
     };
 

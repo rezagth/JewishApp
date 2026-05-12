@@ -13,6 +13,10 @@ export interface PrayerSection {
   subtitle?: string;
   category: 'obligatoire' | 'optionnel' | 'special';
   verses: PrayerVerse[];
+  sources?: Array<{
+    label: string;
+    url: string;
+  }>;
 }
 
 export interface PrayerVerse {
@@ -34,6 +38,10 @@ export interface SiddurService {
   icon: string;
   color: string;
   sections: PrayerSection[];
+  sources?: Array<{
+    label: string;
+    url: string;
+  }>;
 }
 
 // ============================================================
@@ -47,6 +55,12 @@ const shacharitSections: PrayerSection[] = [
     titleHe: 'מוֹדֶה אֲנִי',
     subtitle: 'Prière du réveil',
     category: 'obligatoire',
+    sources: [
+      {
+        label: 'Open Siddur',
+        url: 'https://opensiddur.org/prayers/solilunar/everyday/daytime/birkhot-hashahar/self-awareness/modah-modeh-ani-translation-by-andrew-shaw/',
+      },
+    ],
     verses: [
       {
         id: 'modeh-1',
@@ -193,6 +207,12 @@ const shacharitSections: PrayerSection[] = [
     titleHe: 'פְּסוּקֵי דְזִמְרָה',
     subtitle: 'Versets de louange',
     category: 'obligatoire',
+    sources: [
+      {
+        label: 'Open Siddur',
+        url: 'https://opensiddur.org/prayers/solilunar/everyday/daytime/psukei-dzimrah/yishtabah-shimkha/yishtabah-shimkha-translated-by-zalman-schachter-shalomi/',
+      },
+    ],
     verses: [
       {
         id: 'baruch-sheamar',
@@ -1242,6 +1262,12 @@ export const SIDDUR_DATA: SiddurService[] = [
     titleHe: 'שַׁחֲרִית',
     icon: '🌅',
     color: '#F59E0B',
+    sources: [
+      {
+        label: 'Open Siddur - Weekday Siddur',
+        url: 'https://archive.org/details/SiddurTehillatHaShemYedaberPiWeekdaySiddur?view=theater#page/n0/mode/2up',
+      },
+    ],
     sections: shacharitSections,
   },
   {
@@ -1250,6 +1276,12 @@ export const SIDDUR_DATA: SiddurService[] = [
     titleHe: 'מִנְחָה',
     icon: '☀️',
     color: '#3B82F6',
+    sources: [
+      {
+        label: 'Open Siddur - Weekday Siddur',
+        url: 'https://archive.org/details/SiddurTehillatHaShemYedaberPiWeekdaySiddur?view=theater#page/n0/mode/2up',
+      },
+    ],
     sections: minhaSections,
   },
   {
@@ -1258,6 +1290,12 @@ export const SIDDUR_DATA: SiddurService[] = [
     titleHe: 'עַרְבִית',
     icon: '🌙',
     color: '#8B5CF6',
+    sources: [
+      {
+        label: 'Open Siddur - Weekday Siddur',
+        url: 'https://archive.org/details/SiddurTehillatHaShemYedaberPiWeekdaySiddur?view=theater#page/n0/mode/2up',
+      },
+    ],
     sections: arvitSections,
   },
   {

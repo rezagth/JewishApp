@@ -13,7 +13,7 @@ import { useI18n } from '@hooks/useI18n';
 import { useAppSelector, useAppDispatch } from '@hooks/useRedux';
 import { useTheme } from '@hooks/useTheme';
 import { useNavigation } from '@react-navigation/native';
-import { getPrayerTimeCategories } from '@services/prayerCategories.service';
+import { PRAYER_TIME_CATEGORIES } from '@services/sefaria.service';
 import { setDarkMode } from '@store/slices/userSlice';
 import { Ionicons } from '@expo/vector-icons';
 
@@ -32,8 +32,7 @@ const HomeScreen = () => {
   const styles = createStyles(theme);
 
   const handleStartPrayer = () => {
-    const categories = getPrayerTimeCategories(nusach);
-    const currentCat = categories.find(c => c.timeOfDay === currentService);
+    const currentCat = PRAYER_TIME_CATEGORIES.find((c) => c.timeOfDay === currentService);
     if (currentCat) {
       navigation.navigate('Siddur', { category: currentCat });
     } else {

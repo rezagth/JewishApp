@@ -1,4 +1,6 @@
-// Types pour les prières liturgiques (Siddur)
+// Runtime compatibility types for app-wide imports that still use @types/index.
+// Keep this broader than src/types/index.ts so the copied siddur files can stay exact.
+
 export interface Prayer {
   id: string;
   title: string;
@@ -12,7 +14,7 @@ export interface Prayer {
 }
 
 export type ServiceType = 'shacharit' | 'mincha' | 'arvit' | "ma'ariv";
-export type Nusach = 'ashkenazi' | 'sefardi' | 'chabad' | 'sephardi';
+export type Nusach = 'ashkenazi' | 'sefardi' | 'chabad' | 'sephardi' | 'sephardic' | 'mizrahi' | 'teimani';
 
 export interface Bracha {
   id: string;
@@ -21,7 +23,6 @@ export interface Bracha {
   contentHe: string;
 }
 
-// Types pour le calendrier et Zmanim
 export interface ZmanDetails {
   alot: string;
   sunrise: string;
@@ -42,7 +43,6 @@ export interface JewishHoliday {
   torah_portion?: string;
 }
 
-// Types pour la communauté
 export interface Question {
   id: string;
   title: string;
@@ -71,7 +71,6 @@ export type QuestionCategory =
   | 'theology'
   | 'other';
 
-// Types utilisateur
 export interface User {
   id: string;
   name: string;
@@ -90,7 +89,7 @@ export interface User {
 export interface UserPreferences {
   language: 'he' | 'fr' | 'en';
   nusach: Nusach;
-  fontSize: number; // 0.8 to 1.5
+  fontSize: number;
   isDarkMode: boolean;
   timezone: string;
   notifications: {
@@ -100,7 +99,6 @@ export interface UserPreferences {
   };
 }
 
-// Types pour les notifications
 export interface NotificationPayload {
   title: string;
   body: string;

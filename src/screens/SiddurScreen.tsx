@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -7,19 +7,12 @@ import {
   ScrollView,
   StatusBar,
 } from 'react-native';
-import { useSelector } from 'react-redux';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useRoute, RouteProp } from '@react-navigation/native';
-import { 
-  getPrayerCategories, 
-  getPrayerTimeCategories, 
-  PrayerCategory 
-} from '@services/prayerCategories.service';
+import { PRAYER_CATEGORIES, PRAYER_TIME_CATEGORIES, PrayerCategory } from '../services/sefaria.service';
 import { usePrayerTime } from '@hooks/usePrayerTime';
 import PrayerReaderScreen from '@screens/PrayerReaderScreen';
 import { useTheme } from '@hooks/useTheme';
 import { AppTheme } from '@constants/theme';
-import { RootState } from '@store/index';
 import dayjs from 'dayjs';
 
 // ─── Composant ligne de prière ────────────────────────────────────────────────
@@ -28,10 +21,9 @@ interface PrayerRowProps {
   onPress: () => void;
   isCurrent?: boolean;
   theme: AppTheme;
-  showChevron?: boolean;
 }
 
-const PrayerRow: React.FC<PrayerRowProps> = ({ category, onPress, isCurrent = false, theme, showChevron = true }) => {
+const PrayerRow: React.FC<PrayerRowProps> = ({ category, onPress, isCurrent = false, theme }) => {
   const styles = createStyles(theme);
   
   return (
@@ -40,10 +32,10 @@ const PrayerRow: React.FC<PrayerRowProps> = ({ category, onPress, isCurrent = fa
       onPress={onPress} 
       activeOpacity={0.6}
     >
-      {showChevron && <Text style={[styles.chevron, isCurrent && styles.chevronCurrent]}>‹</Text>}
+      <Text style={[styles.chevron, isCurrent && styles.chevronCurrent]}>‹</Text>
       <View style={styles.rowTextWrap}>
         <Text style={[styles.rowHe, isCurrent && styles.rowHeCurrent]}>
-          {category.titleHe}
+          {category.emoji ? `${category.titleHe} ${category.emoji}` : category.titleHe}
         </Text>
         <Text style={[styles.rowFr, isCurrent && styles.rowFrCurrent]}>{category.titleFr}</Text>
       </View>
@@ -102,52 +94,20 @@ const CurrentPrayerIndicator: React.FC<CurrentPrayerIndicatorProps> = ({
   );
 };
 
-type SiddurRouteProp = RouteProp<{ Siddur: { category?: PrayerCategory } }, 'Siddur'>;
-
 // ─── Composant principal ──────────────────────────────────────────────────────
 const SiddurScreen = () => {
   const insets = useSafeAreaInsets();
   const theme = useTheme();
-  const route = useRoute<SiddurRouteProp>();
-  const nusach = useSelector((state: RootState) => state.user.preferences.nusach);
-  
-  const [selectedCategory, setSelectedCategory] = useState<PrayerCategory | null>(route.params?.category || null);
-  const [parentCategory, setParentCategory] = useState<PrayerCategory | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<PrayerCategory | null>(null);
   const { current: currentPrayer } = usePrayerTime();
 
-  React.useEffect(() => {
-    if (route.params?.category) {
-      handleCategoryPress(route.params.category);
-    }
-  }, [route.params?.category]);
-
   const styles = createStyles(theme);
-
-  const prayerCategories = useMemo(() => getPrayerCategories(nusach), [nusach]);
-  const prayerTimeCategories = useMemo(() => getPrayerTimeCategories(nusach), [nusach]);
-
-  const handleCategoryPress = (cat: PrayerCategory) => {
-    if (cat.subCategories && cat.subCategories.length > 0) {
-      setParentCategory(cat);
-      setSelectedCategory(null);
-    } else {
-      setSelectedCategory(cat);
-    }
-  };
-
-  const handleBack = () => {
-    if (selectedCategory) {
-      setSelectedCategory(null);
-    } else if (parentCategory) {
-      setParentCategory(null);
-    }
-  };
 
   if (selectedCategory) {
     return (
       <PrayerReaderScreen
         category={selectedCategory}
-        onBack={handleBack}
+        onBack={() => setSelectedCategory(null)}
       />
     );
   }
@@ -166,91 +126,62 @@ const SiddurScreen = () => {
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.header}>
-          {parentCategory && (
-            <TouchableOpacity onPress={handleBack} style={styles.backBtn}>
-               <Text style={styles.backArrow}>›</Text>
-            </TouchableOpacity>
-          )}
-          <Text style={styles.brand}>{parentCategory ? parentCategory.titleFr.toUpperCase() : 'SIDDUR'}</Text>
-          {!parentCategory && <Text style={styles.headerIcon}>☰</Text>}
+          <Text style={styles.brand}>SIDDUR</Text>
+          <Text style={styles.headerIcon}>☰</Text>
         </View>
 
-        {!parentCategory ? (
-          <>
-            <Text style={styles.titleHe}>תפילות</Text>
-            <Text style={styles.titleFr}>PRIERES</Text>
+        <Text style={styles.titleHe}>תפילות</Text>
+        <Text style={styles.titleFr}>PRIERES</Text>
 
-            <View style={styles.nusachBadge}>
-              <Text style={styles.nusachBadgeText}>
-                Rite: {nusach === 'ashkenazi' ? 'Ashkénaze' : 'Séfarade'}
-              </Text>
-            </View>
+        {currentPrayer && (
+          <CurrentPrayerIndicator
+            name={currentPrayer.name}
+            nameHe={currentPrayer.nameHe}
+            progress={currentPrayer.progress}
+            endTime={currentPrayer.endTime}
+            theme={theme}
+          />
+        )}
 
-            {currentPrayer && (
-              <CurrentPrayerIndicator
-                name={currentPrayer.name}
-                nameHe={currentPrayer.nameHe}
-                progress={currentPrayer.progress}
-                endTime={currentPrayer.endTime}
+        {/* Services Quotidiens */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Services Quotidiens</Text>
+          <View style={styles.sectionList}>
+            {PRAYER_TIME_CATEGORIES.map((cat: typeof PRAYER_TIME_CATEGORIES[number]) => {
+              const isCurrent = currentPrayer?.nameHe === cat.titleHe;
+              return (
+                <PrayerRow
+                  key={cat.id}
+                  category={cat}
+                  onPress={() => setSelectedCategory(cat)}
+                  isCurrent={isCurrent}
+                  theme={theme}
+                />
+              );
+            })}
+          </View>
+        </View>
+
+        {/* Prières diverses */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Prières diverses</Text>
+          <View style={styles.sectionList}>
+            {PRAYER_CATEGORIES.map((cat: PrayerCategory) => (
+              <PrayerRow
+                key={cat.id}
+                category={cat}
+                onPress={() => setSelectedCategory(cat)}
                 theme={theme}
               />
-            )}
-
-            {/* Services Quotidiens */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Services Quotidiens</Text>
-              <View style={styles.sectionList}>
-                {prayerTimeCategories.map((cat) => {
-                  const isCurrent = currentPrayer?.name.toLowerCase().includes(cat.id);
-                  return (
-                    <PrayerRow
-                      key={cat.id}
-                      category={cat}
-                      onPress={() => handleCategoryPress(cat)}
-                      isCurrent={isCurrent}
-                      theme={theme}
-                    />
-                  );
-                })}
-              </View>
-            </View>
-
-            {/* Prières diverses */}
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Prières diverses</Text>
-              <View style={styles.sectionList}>
-                {prayerCategories.map((cat) => (
-                  <PrayerRow
-                    key={cat.id}
-                    category={cat}
-                    onPress={() => handleCategoryPress(cat)}
-                    theme={theme}
-                  />
-                ))}
-              </View>
-            </View>
-          </>
-        ) : (
-          <View style={styles.subCatSection}>
-             <Text style={styles.titleHe}>{parentCategory.titleHe}</Text>
-             <View style={[styles.sectionList, {marginTop: 20}]}>
-                {parentCategory.subCategories?.map((sub) => (
-                  <PrayerRow
-                    key={sub.id}
-                    category={sub}
-                    onPress={() => handleCategoryPress(sub)}
-                    theme={theme}
-                    showChevron={false}
-                  />
-                ))}
-             </View>
+            ))}
           </View>
-        )}
+        </View>
       </ScrollView>
     </View>
   );
 };
 
+// ─── Styles ───────────────────────────────────────────────────────────────────
 const createStyles = (theme: AppTheme) => StyleSheet.create({
   screen: {
     flex: 1,
@@ -283,32 +214,13 @@ const createStyles = (theme: AppTheme) => StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingBottom: 14,
-    height: 60,
-  },
-  backBtn: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: theme.colors.card,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  backArrow: {
-    fontSize: 26,
-    color: theme.colors.primary,
-    transform: [{ rotate: '180deg' }],
-    lineHeight: 30,
   },
   brand: {
     color: theme.colors.primary,
-    fontSize: 22,
+    fontSize: 26,
     letterSpacing: 1.6,
     fontWeight: '800',
     fontFamily: 'serif',
-    flex: 1,
-    textAlign: 'center',
   },
   headerIcon: {
     color: theme.colors.secondary,
@@ -442,26 +354,6 @@ const createStyles = (theme: AppTheme) => StyleSheet.create({
   rowFrCurrent: {
     color: theme.colors.text,
   },
-  nusachBadge: {
-    alignSelf: 'flex-end',
-    marginTop: 8,
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    backgroundColor: theme.colors.highlight,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: theme.colors.border,
-  },
-  nusachBadgeText: {
-    fontSize: 10,
-    color: theme.colors.secondary,
-    fontWeight: 'bold',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
-  },
-  subCatSection: {
-    marginTop: 10,
-  }
 });
 
 export default SiddurScreen;
