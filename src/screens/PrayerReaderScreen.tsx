@@ -48,6 +48,34 @@ const PrayerReaderScreen: React.FC<Props> = ({ category, onBack }) => {
   const loadText = useCallback(async () => {
     if (isService) return;
 
+    if (category.id === 'birkat_hamazon') {
+      const localBirkat = userNusach === 'sephardic'
+        ? category.sephardicStaticHe || category.staticHe
+        : category.staticHe;
+
+      if (localBirkat) {
+        setSefariaData({
+          titleHe: category.titleHe,
+          titleEn: category.titleFr,
+          heText: localBirkat,
+          enText: '',
+          ref: category.id,
+        });
+        return;
+      }
+    }
+
+    if (category.staticHe && !category.sefariaRef) {
+      setSefariaData({
+        titleHe: category.titleHe,
+        titleEn: category.titleFr,
+        heText: category.staticHe,
+        enText: '',
+        ref: category.id,
+      });
+      return;
+    }
+
     const selectedRef = userNusach === 'sephardic' && category.sephardicSefariaRef
       ? category.sephardicSefariaRef
       : category.sefariaRef;
